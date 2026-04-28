@@ -4,86 +4,106 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      :root {
-        --national-saffron: #E67E22; /* Slightly darker for better contrast on white/dark */
-        --national-white: #FFFFFF;
-        --national-green: #138808;
-        --national-blue: #000080;
-      }
-      .skip-link {
-        position: absolute;
-        top: -40px;
-        left: 0;
-        background: var(--national-saffron);
-        color: white;
-        padding: 8px;
-        z-index: 100;
-      }
-      .skip-link:focus {
-        top: 0;
-      }
-    </style>
     <title>JanMat AI | Bharat Election Guide</title>
-    <meta name="description" content="An interactive AI assistant for the Indian Election Process. Powered by Google Gemini.">
+    <meta name="description" content="Professional AI assistant for the Indian Election Process. Powered by Vertex AI.">
     <!-- Google Fonts: Inter & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
+    <script>
+      function scrollToSection(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      }
+    </script>
   </head>
-  <body style="position: relative;">
-    <a href="#interactive-content" class="skip-link">Skip to main content</a>
+  <body>
     <div id="app">
-      <!-- Premium Glassmorphic Layout Starts Here -->
       <header class="navbar">
-        <a href="/" class="logo" aria-label="JanMat AI Home - Refresh Page">JanMat<span>AI</span></a>
+        <a href="/" class="logo" aria-label="JanMat AI Home">JanMat<span>AI</span></a>
         <nav>
-          <a href="#home">Home</a>
-          <a href="#process">The Process</a>
-          <a href="#about">About</a>
+          <a href="#home" onclick="scrollToSection('home')">Home</a>
+          <a href="#process" onclick="scrollToSection('process')">The Process</a>
+          <a href="#about" onclick="scrollToSection('about')">About & FAQ</a>
         </nav>
       </header>
 
-      <main class="hero-section">
+      <!-- Home / Hero Section -->
+      <main id="home" class="hero-section">
         <div class="hero-content">
           <h1 class="gradient-text">Master the Election Process</h1>
-          <p class="subtitle">Your AI-powered guide to timelines, steps, and civic participation.</p>
+          <p class="subtitle">A premium, AI-powered journey through Bharat's democratic process. Simple, neutral, and actionable.</p>
           <div class="cta-group">
-            <button id="start-journey" class="btn-primary" aria-label="Start the Election Journey Guide">Start My Journey</button>
-            <button id="ask-ai" class="btn-secondary" aria-label="Ask the JanMat AI Assistant">Ask Gemini AI</button>
+            <button class="btn-primary" onclick="scrollToSection('process')">Start Your Journey</button>
+            <button class="btn-secondary" onclick="scrollToSection('ai-chat')">Ask JanMat AI</button>
           </div>
         </div>
       </main>
 
-      <section class="glass-container" id="interactive-content" aria-live="polite">
-        <div class="skeleton-hero skeleton"></div>
-        <div style="margin-top: 2rem;">
-          <div class="skeleton-text skeleton" style="width: 60%; margin: 1rem auto;"></div>
-          <div class="skeleton-text skeleton" style="width: 80%; margin: 1rem auto;"></div>
+      <!-- The Process Section -->
+      <section id="process" class="process-section glass-container">
+        <h2 class="section-title">Your ECI Election Journey</h2>
+        <div class="timeline" id="election-timeline">
+          <div class="timeline-item active" data-step="1">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h3>Voter Registration (Form 6)</h3>
+              <p>The first step to citizenship. Register on the NVSP portal or Voter Helpline App.</p>
+              <div class="details">➜ Required: Age Proof, Address Proof, Photo.</div>
+            </div>
+          </div>
+          <div class="timeline-item" data-step="2">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h3>Verification & Roll</h3>
+              <p>BLO verification ensures your entry is valid. Check your name in the Electoral Roll regularly.</p>
+            </div>
+          </div>
+          <div class="timeline-item" data-step="3">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h3>Polling Day</h3>
+              <p>Carry your EPIC card or valid ID. Visit your station and cast your vote for Bharat!</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- New FAQ & Details Section -->
-      <section class="faq-section" id="about">
-        <div class="container">
-          <h2 class="section-title">Frequently Asked Questions</h2>
+      <!-- AI Chat Section -->
+      <section id="ai-chat" class="chat-section glass-container">
+        <h2 class="section-title">Consult JanMat AI</h2>
+        <div class="chat-box">
+          <div class="chat-messages" id="chat-messages">
+            <div class="message ai">Namaste! I'm JanMat AI, your Senior Civic Consultant. How can I help you understand the election process today?</div>
+          </div>
+          <div class="chat-input-group">
+            <input type="text" id="user-input" placeholder="e.g., How do I register in West Bengal?">
+            <button id="send-msg">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- About & FAQ Section -->
+      <section id="about" class="faq-section">
+        <div class="glass-container">
+          <h2 class="section-title">About JanMat & FAQ</h2>
+          <p class="subtitle" style="text-align: center; margin-bottom: 3rem;">JanMat AI is a premium initiative to empower Indian citizens with accurate, neutral information. Built on the cutting edge of Google's Vertex AI.</p>
           <div class="faq-grid">
             <div class="faq-card">
-              <h3>🗳️ How do I register as a new voter?</h3>
-              <p>Citizens who are 18 years or older can register by filling out <strong>Form 6</strong> on the NVSP portal or through the Voter Helpline App.</p>
+              <h3>🗳️ What is Form 6?</h3>
+              <p>Form 6 is for NEW voter registration. If you are 18+ and not registered, this is your starting point.</p>
             </div>
             <div class="faq-card">
-              <h3>📍 How can I find my polling booth?</h3>
-              <p>You can use the "Know Your Polling Station" feature on the ECI website by entering your EPIC number or searching by details.</p>
+              <h3>📝 What is Form 8?</h3>
+              <p>Form 8 is for corrections (Name, Address, Photo) or shifting your constituency.</p>
             </div>
             <div class="faq-card">
-              <h3>📝 Can I correct details in my Voter ID?</h3>
-              <p>Yes, use <strong>Form 8</strong> for any corrections (name, age, address, or photo) in your existing electoral entry.</p>
+              <h3>📍 Finding your Booth?</h3>
+              <p>Use your EPIC number on the 'voters.eci.gov.in' portal to find your exact polling station.</p>
             </div>
             <div class="faq-card">
-              <h3>🆔 What is an EPIC card?</h3>
-              <p>EPIC stands for Elector's Photo Identity Card. It is the official identity document issued by the ECI to all eligible voters.</p>
+              <h3>🆔 Digital Voter ID?</h3>
+              <p>New voters can download their e-EPIC (digital Voter ID) directly from the NVSP portal.</p>
             </div>
           </div>
         </div>
