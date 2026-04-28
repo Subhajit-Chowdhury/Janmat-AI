@@ -79,7 +79,7 @@ body::after {
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 800;
@@ -87,12 +87,11 @@ body::after {
   transition: transform 0.3s ease;
 }
 
-.logo::before {
-  content: "☸";
-  color: #3b82f6; /* Vibrant Blue for Chakra */
-  font-size: 2rem;
-  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
-  animation: rotate 10s linear infinite;
+.ashoka-chakra {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 128, 0.3));
+  animation: rotate 15s linear infinite;
 }
 
 @keyframes rotate {
@@ -132,13 +131,64 @@ nav a:hover {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 6rem 5%;
-  background: radial-gradient(circle at 20% 30%, rgba(255, 153, 51, 0.15), transparent 40%),
-              radial-gradient(circle at 80% 70%, rgba(19, 136, 8, 0.15), transparent 40%);
+  padding: 8rem 5%;
+  background: radial-gradient(circle at 20% 30%, rgba(255, 153, 51, 0.1), transparent 40%),
+              radial-gradient(circle at 80% 70%, rgba(19, 136, 8, 0.1), transparent 40%);
 }
 
 .hero-content {
   max-width: 900px;
+}
+
+.mission-tag {
+  display: inline-block;
+  padding: 0.5rem 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--national-saffron);
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.8s ease-out;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.mission-tag:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(255, 153, 51, 0.3);
+}
+
+.mission-tag::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.mission-tag:hover::after {
+  left: 100%;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .gradient-text {
@@ -192,40 +242,21 @@ nav a:hover {
 .btn-secondary {
   padding: 1rem 2.5rem;
   border-radius: 50px;
-  border: 2px solid var(--national-blue);
-  background: rgba(0, 0, 128, 0.1);
-  color: white;
-  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
+  backdrop-filter: blur(5px);
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(0, 0, 128, 0.2);
-}
-
-.btn-secondary::after {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transform: rotate(45deg);
-  animation: shimmer 3s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) rotate(45deg); }
 }
 
 .btn-secondary:hover {
-  background: var(--national-blue);
-  transform: scale(1.05) translateY(-3px);
-  box-shadow: 0 15px 40px rgba(0, 0, 128, 0.5);
-  border-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Glass Container & Common Layouts */
@@ -366,11 +397,18 @@ nav a:hover {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.timeline-item:hover {
+  transform: scale(1.03) translateY(-5px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 153, 51, 0.5); /* Saffron glow on hover */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
 .timeline-item.active {
   border-color: var(--national-saffron);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(230, 126, 34, 0.2);
+  transform: scale(1.05); /* Stays popped out when active */
 }
 
 .step-num {
@@ -461,18 +499,47 @@ nav a:hover {
 /* Chat Interface Styles */
 .chat-section {
   position: relative;
-  box-shadow: 0 0 50px rgba(59, 130, 246, 0.15); /* Soft AI Glow */
-  border-color: var(--national-blue) !important;
+  z-index: 1;
 }
 
+/* Animated AI Aura Border */
 .chat-box {
   display: flex;
   flex-direction: column;
-  height: 400px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
+  height: 500px;
+  background: var(--bg-color);
+  border-radius: 24px;
+  position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chat-box::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    transparent 30%,
+    var(--national-saffron) 40%,
+    var(--national-white) 50%,
+    var(--national-green) 60%,
+    transparent 70%,
+    transparent 100%
+  );
+  border-radius: 25px;
+  z-index: -1;
+  animation: rotateBorder 6s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes rotateBorder {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .chat-messages {
@@ -507,30 +574,43 @@ nav a:hover {
 
 .chat-input-group {
   display: flex;
-  padding: 1rem;
+  padding: 1.5rem;
   background: rgba(255, 255, 255, 0.02);
-  gap: 0.5rem;
-  border-top: 1px solid var(--glass-border);
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .chat-input-group input {
   flex: 1;
-  background: transparent;
-  border: 1px solid var(--glass-border);
-  padding: 0.8rem 1.2rem;
-  border-radius: 50px;
-  color: white;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1rem;
   outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat-input-group input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
 }
 
 .chat-input-group button {
-  padding: 0.8rem 1.5rem;
-  border-radius: 50px;
+  padding: 0 2rem;
+  border-radius: 16px;
   border: none;
-  background: var(--national-green);
+  background: var(--accent-primary);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.chat-input-group button:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
 }
 
 /* Responsive Design Overhaul */
