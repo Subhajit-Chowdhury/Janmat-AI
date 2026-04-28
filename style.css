@@ -9,10 +9,10 @@
   --font-main: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
   --glass-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  --national-saffron: #E67E22;
+  --national-saffron: #FF9933; /* Official Saffron */
   --national-white: #FFFFFF;
   --national-green: #138808;
-  --national-blue: #000080;
+  --national-blue: #000080; /* Ashoka Chakra Blue */
 }
 
 * {
@@ -65,11 +65,12 @@ body::after {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 5%;
+  padding: 1.5rem 5%;
   backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
   z-index: 100;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .logo {
@@ -77,7 +78,7 @@ body::after {
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
@@ -85,23 +86,33 @@ body::after {
   transition: transform 0.3s ease;
 }
 
+.logo::before {
+  content: "☸"; /* Unicode Dharma Wheel for Ashoka Chakra */
+  color: var(--national-blue);
+  font-size: 1.8rem;
+  display: inline-block;
+}
+
 .logo:hover {
   transform: scale(1.05);
 }
 
 .logo span {
-  color: var(--accent-primary);
-  background: linear-gradient(to right, var(--national-saffron), var(--national-green));
+  background: linear-gradient(to right, var(--national-saffron), var(--national-white), var(--national-green));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
 nav a {
   color: var(--text-secondary);
   text-decoration: none;
-  margin-left: 2rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: color 0.3s ease;
 }
 
@@ -116,8 +127,8 @@ nav a:hover {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 5%;
-  background: radial-gradient(circle at top right, rgba(230, 126, 34, 0.05), transparent),
+  padding: 3rem 5%;
+  background: radial-gradient(circle at top right, rgba(255, 153, 51, 0.05), transparent),
               radial-gradient(circle at bottom left, rgba(19, 136, 8, 0.05), transparent);
 }
 
@@ -127,10 +138,10 @@ nav a:hover {
 
 .gradient-text {
   font-family: var(--font-display);
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 800;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #fff 0%, var(--national-saffron) 50%, var(--national-green) 100%);
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, var(--national-saffron), var(--national-white), var(--national-green));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -139,9 +150,9 @@ nav a:hover {
 }
 
 .subtitle {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--text-secondary);
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 /* Buttons */
@@ -152,12 +163,12 @@ nav a:hover {
 }
 
 .btn-primary {
-  padding: 0.8rem 2rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 50px;
   border: none;
-  background: linear-gradient(to right, var(--national-saffron), var(--national-green));
-  color: white;
-  font-weight: 600;
+  background: linear-gradient(to right, var(--national-saffron), var(--national-white), var(--national-green));
+  color: #000; /* Better contrast on tricolor */
+  font-weight: 800;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: pulse 2s infinite;
