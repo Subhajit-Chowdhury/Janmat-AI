@@ -1,18 +1,17 @@
 :root {
-  --bg-color: #050505;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
+  --bg-color: #08090a; /* Sophisticated Deep Dark */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
   --accent-primary: #3b82f6;
   --accent-secondary: #8b5cf6;
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.08);
   --font-main: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
-  --glass-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  --national-saffron: #FF9933; /* Official Saffron */
+  --national-saffron: #FF9933;
   --national-white: #FFFFFF;
   --national-green: #138808;
-  --national-blue: #000080; /* Ashoka Chakra Blue */
+  --national-blue: #000080;
 }
 
 * {
@@ -33,25 +32,25 @@ body {
 body::before, body::after {
   content: "";
   position: fixed;
-  width: 40vw;
-  height: 40vw;
+  width: 80vw;
+  height: 80vw;
   border-radius: 50%;
-  filter: blur(100px);
+  filter: blur(150px);
   z-index: -1;
-  opacity: 0.15;
+  opacity: 0.07; /* More subtle, Google-style glow */
   pointer-events: none;
 }
 
 body::before {
-  top: -10vw;
-  right: -10vw;
-  background: var(--national-saffron);
+  top: -20vw;
+  right: -20vw;
+  background: radial-gradient(circle, var(--national-saffron), transparent);
 }
 
 body::after {
-  bottom: -10vw;
-  left: -10vw;
-  background: var(--national-green);
+  bottom: -20vw;
+  left: -20vw;
+  background: radial-gradient(circle, var(--national-green), transparent);
 }
 
 #app {
@@ -397,9 +396,20 @@ nav a:hover {
 
 .details {
   margin-top: 1rem;
-  color: #2ecc71; /* Brighter green for better visibility */
+  color: #2ecc71;
   font-weight: 700;
   font-size: 0.9rem;
+}
+
+.details a {
+  color: #ffffff; /* Pure white for maximum visibility */
+  text-decoration: underline;
+  text-decoration-color: var(--national-saffron);
+  transition: color 0.3s ease;
+}
+
+.details a:hover {
+  color: var(--national-saffron);
 }
 
 /* Footer */
@@ -443,16 +453,18 @@ nav a:hover {
 }
 
 .text-link {
-  color: var(--accent-primary);
+  color: #ffffff;
   text-decoration: underline;
   font-weight: 600;
 }
 
-.text-link:hover {
-  color: var(--national-saffron);
+/* Chat Interface Styles */
+.chat-section {
+  position: relative;
+  box-shadow: 0 0 50px rgba(59, 130, 246, 0.15); /* Soft AI Glow */
+  border-color: var(--national-blue) !important;
 }
 
-/* Chat Interface Styles */
 .chat-box {
   display: flex;
   flex-direction: column;
