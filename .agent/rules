@@ -1,0 +1,16 @@
+# Antigravity Rules for JanMat AI
+
+## Core Principles
+1. **Security First**: Never commit API keys. Use `.env` and provide a `.env.example`.
+2. **Modern JS**: Use ES6+ features and ES Modules.
+3. **Rich Aesthetics**: Every UI component must feel premium. Use HSL colors, smooth transitions, and modern typography (Inter/Outfit).
+4. **Firebase Best Practices**: 
+   - Keep initialization logic in a dedicated `src/lib/firebase.js`.
+   - Use modular SDK imports.
+5. **AI Integration**:
+   - Wrap Gemini API calls in a robust service layer with error handling.
+   - Implement loading states and streaming UI where possible.
+
+## Graph Integrity
+- Before any major refactor, run `/graphify .` to ensure context is up to date.
+- Use `/graphify callers` and `/graphify callees` to assess blast radius of changes.

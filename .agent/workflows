@@ -1,0 +1,22 @@
+# Antigravity Workflows for JanMat AI
+
+## 🛠️ Development Loop
+1. **Initialize**: `npm install`
+2. **Start Dev**: `npm run dev`
+3. **Graphify**: Run `/graphify .` to index the project.
+
+## 🚀 Deployment Workflow
+1. **Build**: `npm run build`
+2. **Test**: Run `npm run preview` to verify the build.
+3. **Deploy**: (Placeholder for Firebase/Vercel command)
+
+## 🧠 AI Feature Addition
+1. **Prompt Design**: Define the prompt in `src/prompts/`.
+2. **Service Update**: Add the method to `src/services/aiService.js`.
+3. **UI Integration**: Create/Update components in `src/components/`.
+4. **Validation**: Test with multiple inputs to ensure reliability.
+
+## 🔍 Code Audit
+1. Run `/graphify status` to check index health.
+2. Run `/graphify search TODO` to find pending tasks.
+3. Use `/graphify impact` on core files before submitting.

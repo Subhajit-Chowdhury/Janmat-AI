@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        --national-saffron: #E67E22; /* Slightly darker for better contrast on white/dark */
+        --national-white: #FFFFFF;
+        --national-green: #138808;
+        --national-blue: #000080;
+      }
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: var(--national-saffron);
+        color: white;
+        padding: 8px;
+        z-index: 100;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+    </style>
+    <title>JanMat AI | Bharat Election Guide</title>
+    <meta name="description" content="An interactive AI assistant for the Indian Election Process. Powered by Google Gemini.">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body style="position: relative;">
+    <a href="#interactive-content" class="skip-link">Skip to main content</a>
+    <div id="app">
+      <!-- Premium Glassmorphic Layout Starts Here -->
+      <header class="navbar">
+        <div class="logo">JanMat<span>AI</span></div>
+        <nav>
+          <a href="#home">Home</a>
+          <a href="#process">The Process</a>
+          <a href="#about">About</a>
+        </nav>
+      </header>
+
+      <main class="hero-section">
+        <div class="hero-content">
+          <h1 class="gradient-text">Master the Election Process</h1>
+          <p class="subtitle">Your AI-powered guide to timelines, steps, and civic participation.</p>
+          <div class="cta-group">
+            <button id="start-journey" class="btn-primary" aria-label="Start the Election Journey Guide">Start My Journey</button>
+            <button id="ask-ai" class="btn-secondary" aria-label="Ask the JanMat AI Assistant">Ask Gemini AI</button>
+          </div>
+        </div>
+      </main>
+
+      <section class="glass-container" id="interactive-content" aria-live="polite">
+        <!-- Interactive components will be injected here -->
+      </section>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
