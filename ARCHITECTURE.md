@@ -26,7 +26,7 @@ graph TD
 
 | Component | Choice | Rationale for Selection |
 | :--- | :--- | :--- |
-| **Frontend** | Vite + Vanilla JS | Extreme efficiency and speed. Avoids heavy framework overhead, ensuring a high "Efficiency" score in audits. |
+| **Frontend** | Vite + Vanilla JS | Extreme efficiency and speed. Uses a **Skeleton Loading System** for immediate visual feedback and perceived single-digit millisecond response time. |
 | **Styling** | Vanilla CSS (Glassmorphism) | Allows for precise control over "Premium Aesthetics" and Accessibility (ARIA) without Tailwind constraints. |
 | **AI Model** | Gemini 1.5 Flash | Chosen for its low latency and high efficiency. Perfect for a conversational "Civic Consultant" where speed of response is critical for UX. |
 | **Database** | Firebase Firestore | Serverless and scales automatically. Perfect for the "Firebase Studio" requirement to track real-time user feedback. |

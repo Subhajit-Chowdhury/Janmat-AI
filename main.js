@@ -12,12 +12,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle Journey Start
   startBtn.addEventListener('click', () => {
-    renderTimeline();
+    interactiveContent.classList.add('fade-out');
+    setTimeout(() => {
+      renderTimeline();
+      interactiveContent.classList.remove('fade-out');
+      interactiveContent.classList.add('fade-in');
+    }, 300);
   });
 
   // Handle AI Chat Start
   askBtn.addEventListener('click', () => {
-    renderChatInterface();
+    interactiveContent.classList.add('fade-out');
+    setTimeout(() => {
+      renderChatInterface();
+      interactiveContent.classList.remove('fade-out');
+      interactiveContent.classList.add('fade-in');
+    }, 300);
   });
 });
 
@@ -119,10 +129,13 @@ async function sendMessage() {
   input.value = '';
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Add "Thinking..." indicator
+  // Add Skeleton Loader indicator
   const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'message ai loading';
-  loadingDiv.textContent = 'JanMat is thinking';
+  loadingDiv.className = 'message ai skeleton-message';
+  loadingDiv.innerHTML = `
+    <div class="skeleton skeleton-text" style="width: 100px;"></div>
+    <div class="skeleton skeleton-text" style="width: 200px;"></div>
+  `;
   chatMessages.appendChild(loadingDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
