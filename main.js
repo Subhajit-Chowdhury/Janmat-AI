@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Location Toggle Logic
+  const btnRural = document.getElementById('toggle-rural');
+  const btnUrban = document.getElementById('toggle-urban');
+  
+  if (btnRural && btnUrban) {
+    btnRural.addEventListener('click', () => updateLocationContext('rural'));
+    btnUrban.addEventListener('click', () => updateLocationContext('urban'));
+  }
+
   // Timeline Item Click logic
   const items = document.querySelectorAll('.timeline-item');
   items.forEach(item => {
@@ -28,6 +37,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+/**
+ * Updates the timeline text based on Rural vs Urban selection
+ */
+function updateLocationContext(type) {
+  const btnRural = document.getElementById('toggle-rural');
+  const btnUrban = document.getElementById('toggle-urban');
+  const h1 = document.getElementById('step-1-how');
+  const h2 = document.getElementById('step-2-how');
+  const h3 = document.getElementById('step-3-how');
+
+  if (type === 'rural') {
+    btnRural.classList.add('active');
+    btnUrban.classList.remove('active');
+    h1.innerHTML = '<strong>How:</strong> Apply online. For Rural areas, your local BLO will coordinate with the Gram Panchayat for verification.';
+    h2.innerHTML = '<strong>How:</strong> The BLO visits your residence. In Rural areas, you can also consult your Pradhan\'s office for status.';
+    h3.innerHTML = '<strong>How:</strong> Locate your booth and carry a valid ID. In Rural areas, check the local primary school or community hall.';
+  } else {
+    btnUrban.classList.add('active');
+    btnRural.classList.remove('active');
+    h1.innerHTML = '<strong>How:</strong> Apply online via ECI Portal. In Urban areas, verification is handled by Ward Offices or Municipal Centers.';
+    h2.innerHTML = '<strong>How:</strong> BLO verification at your door. You can visit your local Ward Office for any queries or help.';
+    h3.innerHTML = '<strong>How:</strong> Check your assigned polling station at a nearby Government School or Community Center.';
+  }
+}
 
 /**
  * Handles sending a message in the chat

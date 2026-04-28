@@ -255,17 +255,59 @@ nav a:hover {
   pointer-events: none;
 }
 
+/* Location Toggle */
+.location-toggle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  padding: 1rem;
+}
+
+.toggle-label {
+  font-weight: 700;
+  color: var(--national-white);
+  font-size: 1.1rem;
+}
+
+.toggle-switch {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: 50px;
+  border: 1px solid var(--glass-border);
+}
+
+.toggle-btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn.active {
+  background: var(--national-saffron);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+}
+
 .section-title {
   font-family: var(--font-display);
-  font-size: 2.8rem;
+  font-size: 3.2rem;
   font-weight: 800;
   text-align: center;
   margin-bottom: 3.5rem;
-  background: linear-gradient(to right, var(--national-saffron), var(--national-white), var(--national-green));
+  background: linear-gradient(to right, #ff9933, #ffffff, #2ecc71);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: -1px;
+  letter-spacing: -2px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .faq-grid {
@@ -275,57 +317,61 @@ nav a:hover {
 }
 
 .faq-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  padding: 2rem;
-  border-radius: 20px;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 2.5rem;
+  border-radius: 24px;
+  transition: all 0.3s ease;
 }
 
 .faq-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
   border-color: var(--national-saffron);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .faq-card h3 {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   margin-bottom: 1rem;
-  color: var(--national-saffron);
+  color: #ff9933;
 }
 
 .faq-card p {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  font-size: 1rem;
+  color: #e4e4e7;
+  line-height: 1.6;
 }
 
 /* Section Specifics */
 .process-section, .chat-section, .faq-section {
   scroll-margin-top: 100px;
-  padding-bottom: 6rem;
+  padding: 8rem 5%;
 }
 
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  max-width: 800px;
+  gap: 3rem;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .timeline-item {
   display: flex;
   gap: 2rem;
-  padding: 2rem;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
   cursor: pointer;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .timeline-item.active {
   border-color: var(--national-saffron);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  transform: scale(1.02);
 }
 
 .step-num {
@@ -351,9 +397,9 @@ nav a:hover {
 
 .details {
   margin-top: 1rem;
-  color: var(--national-green);
-  font-weight: 600;
-  font-size: 0.85rem;
+  color: #2ecc71; /* Brighter green for better visibility */
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 /* Footer */
