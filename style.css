@@ -191,8 +191,8 @@ nav a:hover {
   padding: 1rem 2rem;
   border-radius: 50px;
   border: none;
-  background: linear-gradient(to right, var(--national-saffron), var(--national-white), var(--national-green));
-  color: #000;
+  background: transparent;
+  color: #fff;
   font-weight: 800;
   font-size: 1rem;
   cursor: pointer;
@@ -565,17 +565,6 @@ nav a:hover {
 .magic-glow > * {
   position: relative;
   z-index: 2;
-}
-
-/* Restore hover/active background changes for the inner mask */
-.faq-card:hover::after,
-.timeline-item:hover::after,
-.chat-box:hover::after {
-  background: #111318; /* Slightly lighter on hover */
-}
-
-.timeline-item.active::after {
-  background: #16181d; /* Even lighter for active state */
 }
 
 @keyframes rotate-border {
