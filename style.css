@@ -564,18 +564,17 @@ nav a:hover {
   height: 200%;
   background: conic-gradient(
     from 0deg,
-    transparent 0%,
-    rgba(255, 153, 51, 0.9) 15%,  /* Saffron */
-    rgba(255, 255, 255, 0.9) 30%, /* White */
-    rgba(19, 136, 8, 0.9) 45%,    /* Green */
-    rgba(0, 0, 128, 0.9) 60%,     /* Navy Blue */
-    transparent 75%
+    rgba(255, 153, 51, 1) 0%,   /* Saffron */
+    rgba(255, 255, 255, 1) 25%, /* White */
+    rgba(19, 136, 8, 1) 50%,    /* Green */
+    rgba(0, 0, 128, 1) 75%,     /* Navy Blue */
+    rgba(255, 153, 51, 1) 100%  /* Saffron loop */
   );
-  animation: rotate-border 8s linear infinite; /* Slower, smoother */
+  animation: rotate-border 12s linear infinite; /* Ultra slow, soothing */
   z-index: -2;
-  filter: blur(12px); /* Creates the soft soothing aura */
-  opacity: 0.7;
-  transition: opacity 0.5s ease, filter 0.5s ease;
+  filter: blur(6px); /* Cleaner, simpler glow */
+  opacity: 0.8;
+  transition: opacity 0.8s ease, filter 0.8s ease;
 }
 
 /* The inner dark background to mask the center */
@@ -591,8 +590,8 @@ nav a:hover {
 /* Interaction Effects */
 .magic-glow:hover::before,
 .magic-glow:focus-within::before {
-  animation: rotate-border 4s linear infinite;
-  filter: blur(8px);
+  animation: rotate-border 6s linear infinite; /* Gentle speed up */
+  filter: blur(4px); /* Slightly sharper */
   opacity: 1;
 }
 
@@ -603,7 +602,8 @@ nav a:hover {
 
 /* Restore hover/active background changes for the inner mask */
 .faq-card:hover::after,
-.timeline-item:hover::after {
+.timeline-item:hover::after,
+.chat-box:hover::after {
   background: #111318; /* Slightly lighter on hover */
 }
 
@@ -631,7 +631,7 @@ nav a:hover {
   background: #0a0b0d; /* Deep inner background */
   gap: 1rem;
   border-radius: 18px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .magic-glow {
