@@ -545,45 +545,94 @@ nav a:hover {
   border-bottom-right-radius: 2px;
 }
 
-.chat-input-group {
+/* Magic Glowing Border Effect */
+.ai-input-wrapper {
+  position: relative;
+  margin: 1rem 1.5rem 1.5rem 1.5rem;
+  padding: 2px; /* This is the border width */
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
   display: flex;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.ai-input-wrapper.magic-border::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    #4285f4 10%, /* Google Blue */
+    #ea4335 20%, /* Google Red */
+    #fbbc05 30%, /* Google Yellow */
+    #34a853 40%, /* Google Green */
+    transparent 50%
+  );
+  animation: rotate-border 4s linear infinite;
+  z-index: 0;
+}
+
+@keyframes rotate-border {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.chat-input-group {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  padding: 0.8rem 1rem;
+  background: #0a0b0d; /* Deep inner background */
   gap: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  border: none;
+}
+
+.ai-input-wrapper:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(66, 133, 244, 0.15);
 }
 
 .chat-input-group input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
+  background: transparent; /* More premium look */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.8rem 1.2rem;
+  border-radius: 14px;
   color: #fff;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .chat-input-group input:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+  border-color: rgba(66, 133, 244, 0.4);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .chat-input-group button {
-  padding: 0 2rem;
-  border-radius: 16px;
+  padding: 0 1.5rem;
+  border-radius: 14px;
   border: none;
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, #4285f4, #8b5cf6); /* Gradient button */
   color: white;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .chat-input-group button:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
 }
 
 /* Responsive Design Overhaul */
