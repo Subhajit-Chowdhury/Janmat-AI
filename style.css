@@ -545,19 +545,17 @@ nav a:hover {
   border-bottom-right-radius: 2px;
 }
 
-/* Magic Glowing Border Effect */
-.ai-input-wrapper {
+/* Magic Glowing Aura Effect (Indian Tricolor + Ashoka Blue) */
+.magic-glow {
   position: relative;
-  margin: 1rem 1.5rem 1.5rem 1.5rem;
-  padding: 2px; /* This is the border width */
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
   overflow: hidden;
-  display: flex;
-  transition: all 0.3s ease;
+  z-index: 1;
+  border: none !important; /* Remove hard borders */
+  /* Remove old box-shadows if any */
 }
 
-.ai-input-wrapper.magic-border::before {
+/* The rotating blurred gradient */
+.magic-glow::before {
   content: '';
   position: absolute;
   top: -50%;
@@ -567,19 +565,61 @@ nav a:hover {
   background: conic-gradient(
     from 0deg,
     transparent 0%,
-    #4285f4 10%, /* Google Blue */
-    #ea4335 20%, /* Google Red */
-    #fbbc05 30%, /* Google Yellow */
-    #34a853 40%, /* Google Green */
-    transparent 50%
+    rgba(255, 153, 51, 0.9) 15%,  /* Saffron */
+    rgba(255, 255, 255, 0.9) 30%, /* White */
+    rgba(19, 136, 8, 0.9) 45%,    /* Green */
+    rgba(0, 0, 128, 0.9) 60%,     /* Navy Blue */
+    transparent 75%
   );
+  animation: rotate-border 8s linear infinite; /* Slower, smoother */
+  z-index: -2;
+  filter: blur(12px); /* Creates the soft soothing aura */
+  opacity: 0.7;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+/* The inner dark background to mask the center */
+.magic-glow::after {
+  content: '';
+  position: absolute;
+  inset: 2px; /* Border thickness */
+  background: #0a0b0d; /* Deep background matching the theme */
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Interaction Effects */
+.magic-glow:hover::before,
+.magic-glow:focus-within::before {
   animation: rotate-border 4s linear infinite;
-  z-index: 0;
+  filter: blur(8px);
+  opacity: 1;
+}
+
+.magic-glow > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Restore hover/active background changes for the inner mask */
+.faq-card:hover::after,
+.timeline-item:hover::after {
+  background: #111318; /* Slightly lighter on hover */
+}
+
+.timeline-item.active::after {
+  background: #16181d; /* Even lighter for active state */
 }
 
 @keyframes rotate-border {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.ai-input-wrapper {
+  margin: 1rem 1.5rem 1.5rem 1.5rem;
+  border-radius: 20px;
+  display: flex;
 }
 
 .chat-input-group {
@@ -594,9 +634,14 @@ nav a:hover {
   border: none;
 }
 
-.ai-input-wrapper:focus-within {
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(66, 133, 244, 0.15);
+.magic-glow {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.magic-glow:hover,
+.magic-glow:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 153, 51, 0.15); /* Soft Saffron glow */
 }
 
 .chat-input-group input {
