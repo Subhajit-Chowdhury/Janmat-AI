@@ -317,11 +317,11 @@ nav a:hover {
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 2.5rem;
   border-radius: 24px;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease-out; /* Smoother, slower transition */
 }
 
 .faq-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-5px) scale(1.01); /* Gentler zoom and lift */
   border-color: var(--national-saffron);
   background: rgba(255, 255, 255, 0.08);
 }
@@ -360,11 +360,11 @@ nav a:hover {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 30px;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.5s ease-out; /* Removed bouncy cubic-bezier for a relaxing smooth feel */
 }
 
 .timeline-item:hover {
-  transform: scale(1.03) translateY(-5px);
+  transform: scale(1.02) translateY(-3px); /* Gentler zoom */
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 153, 51, 0.5); /* Saffron glow on hover */
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
@@ -374,7 +374,11 @@ nav a:hover {
   border-color: var(--national-saffron);
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 40px rgba(230, 126, 34, 0.2);
-  transform: scale(1.05);
+  transform: scale(1.03); /* Softer base zoom */
+}
+
+.timeline-item.active:hover {
+  transform: scale(1.04) translateY(-2px); /* Softer hover zoom */
 }
 
 .step-num {
@@ -530,17 +534,17 @@ nav a:hover {
   height: 200%;
   background: conic-gradient(
     from 0deg,
-    rgba(255, 153, 51, 0.8) 0%,   /* Saffron */
-    rgba(255, 255, 255, 0.8) 25%, /* White */
-    rgba(19, 136, 8, 0.8) 50%,    /* Green */
-    rgba(0, 0, 128, 0.8) 75%,     /* Navy Blue */
-    rgba(255, 153, 51, 0.8) 100%  /* Saffron loop */
+    rgba(255, 153, 51, 0.6) 0%,   /* Saffron */
+    rgba(255, 255, 255, 0.6) 25%, /* White */
+    rgba(19, 136, 8, 0.6) 50%,    /* Green */
+    rgba(0, 0, 128, 0.6) 75%,     /* Navy Blue */
+    rgba(255, 153, 51, 0.6) 100%  /* Saffron loop */
   );
-  animation: rotate-border 12s linear infinite; /* Ultra slow, soothing */
+  animation: rotate-border 20s linear infinite; /* Extremely slow, ambient motion */
   z-index: -2;
-  filter: blur(8px); /* Softer, more diffuse glow */
-  opacity: 0.9;
-  transition: opacity 0.8s ease, filter 0.8s ease;
+  filter: blur(14px); /* Very soft, diffuse glow */
+  opacity: 0.5; /* Relaxing ambient level */
+  transition: opacity 1s ease, filter 1s ease;
 }
 
 /* The inner dark background to mask the center */
@@ -557,9 +561,9 @@ nav a:hover {
 /* Interaction Effects */
 .magic-glow:hover::before,
 .magic-glow:focus-within::before {
-  animation: rotate-border 8s linear infinite; /* Gentle speed up */
-  filter: blur(6px); /* Slightly sharper on hover */
-  opacity: 1;
+  animation: rotate-border 15s linear infinite; /* Still very slow on hover */
+  filter: blur(10px); /* Just slightly sharper */
+  opacity: 0.8; /* Brightens softly, not aggressively */
 }
 
 .magic-glow > * {
@@ -591,13 +595,12 @@ nav a:hover {
 }
 
 .magic-glow {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.5s ease-out, box-shadow 0.5s ease-out; /* Smooth, relaxing lift */
 }
 
 .magic-glow:hover,
 .magic-glow:focus-within {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(255, 153, 51, 0.15); /* Soft Saffron glow */
+  box-shadow: 0 10px 25px rgba(255, 153, 51, 0.1); /* Very subtle Saffron ambient shadow */
 }
 
 .chat-input-group input {
