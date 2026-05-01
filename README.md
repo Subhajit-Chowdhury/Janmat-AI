@@ -9,31 +9,29 @@
 
 ## 📖 Project Overview
 
-### 📍 The Challenge
-In India, the world's largest democracy, millions of potential voters—particularly students and young professionals—are often deterred by the perceived complexity of the election process. Critical information about **Form 6 (Registration)**, **BLO verification**, and **polling booth discovery** is scattered across technical government portals, leading to confusion and lower civic engagement.
+### 📌 Chosen Vertical
+**Challenge 2: Election Process Education.**
+In India, the world's largest democracy, millions of potential voters are deterred by the perceived complexity of the election process. Critical information about **Form 6 (Registration)**, **BLO verification**, and **polling booth discovery** is scattered. We chose this vertical to transform this complex bureaucratic process into an **interactive, easy-to-follow educational experience**.
 
-### 🎯 The Mission
-Our objective was to design a solution that transforms this complex bureaucratic process into an **interactive, easy-to-follow educational experience**. **JanMat AI** guides Indian voters through their journey, from the first registration click to the final vote cast, while adhering to the mandatory use of Google's AI ecosystem for the **PromptWars Virtual Challenge**.
+### 🧠 Approach and Logic
+To secure a top standing and provide genuine value, our logic revolves around a **Context-Role-Constraint** framework powered by Google Gemini:
+- **Role-Based Persona**: The AI acts as a "Senior Civic Consultant" programmed to provide *Layman Breakdowns* and avoid bureaucratic jargon.
+- **Contextual Awareness**: The prompt logic dictates specific pathways for Form 6 vs. Form 8.
+- **Strict Neutrality**: Built-in guardrails strictly prevent political bias or hallucinated officer names.
+- **Formatting Logic**: The AI is instructed to output Markdown, which our frontend parses (`marked.js`) into beautiful HTML with rich visuals, satisfying the "easy-to-follow" requirement.
 
-### 🛠️ The Architecture
-We developed **JanMat AI** using a disciplined "brick-by-brick" implementation strategy:
+### ⚙️ How the Solution Works
+We developed **JanMat AI** using a disciplined "brick-by-brick" implementation strategy with Antigravity:
 - **Context-Aware Demographic Toggle**: A brilliant 'Rural vs. Urban' interactive switch that dynamically alters the timeline advice (e.g., Gram Panchayat vs. Ward Office) to account for India's diverse accessibility needs.
 - **Premium UI/UX**: A high-end, glassmorphic design system built with Vanilla CSS ensures the platform feels modern and accessible.
 - **Interactive ECI Timeline**: A visual, step-by-step roadmap of the **Election Commission of India (ECI)** process for interactive exploration.
-- **Gemini 1.5 Flash**: Architected a conversational interface with a structured **system instruction** (Role-based, Constrained, and Few-shot ready) to provide expert-level civic guidance.
-- **Strategic Tooling**: Leveraged **Antigravity** for rapid development, **Google Cloud Run** for containerized deployment, and **Firebase Studio** for real-time session logging and feedback loops.
-
-### 🧠 Prompt Engineering Strategy
-To secure a "Top 3" standing, the AI integration follows a rigorous **Context-Role-Constraint** framework:
-- **Contextual Awareness**: The AI is aware of the current ECI phase and form requirements.
-- **Strict Neutrality**: Built-in safeguards prevent political bias or out-of-scope discussions.
-- **Actionable Output**: Responses are formatted for immediate user action (e.g., links to NVSP, form numbers).
+- **Backend AI Engine**: A Node.js backend connects securely to **Google Gemini 1.5 Flash** (via Vertex AI). It intercepts user questions, injects our engineered system prompt, and returns structured educational guidance.
+- **Strategic Deployment**: Leveraging **Google Cloud Run** for containerized deployment and **Firebase Studio** for real-time session logging.
 
 ### 🏆 Impact & Results
 **JanMat AI** serves as a premium civic education platform that:
 - **Demystifies Registration**: Breaks down complex forms into simple, visual steps.
 - **Enhances Accessibility**: Provides a friendly AI companion (JanMat) who speaks the user's language.
-- **Scales Civic Awareness**: Offers a scalable solution to educate millions of voters, potentially increasing turnout and reducing misinformation.
 
 ---
 
@@ -42,9 +40,9 @@ This project explicitly leverages the following Google services:
 - **AI Core**: [Google Gemini 1.5 Flash](https://aistudio.google.com/) via Vertex AI.
 - **Compute**: [Google Cloud Run](https://cloud.google.com/run) (Containerized Deployment).
 - **Storage/Auth**: [Firebase Studio](https://firebase.google.com/) (Session management).
-- **Architect**: **Antigravity** (Used for brick-by-brick development).
+- **Architect**: **Google Antigravity** (Used for code generation and auditing).
 
-## 🤔 Assumptions Made
+## 🤔 Any Assumptions Made
 - **User Demographics**: Assumed target users are primarily English-speaking Indian citizens comfortable with mobile or desktop web browsing.
 - **Firebase Configuration**: Assumed that the Firebase Studio environment is pre-configured with the necessary read/write rules for session logging.
 - **API Availability**: Assumed that the Google Gemini API (Vertex AI) remains highly available and responds within acceptable latency limits for real-time interactions.
