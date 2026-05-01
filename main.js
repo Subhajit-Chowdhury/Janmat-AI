@@ -4,50 +4,64 @@ import { logChatSession } from './src/api/firebase.js';
 
 // Initialize the App
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('JanMat AI (Market Standard) Initialized');
-  
+  console.log('JanMat AI Initialized');
+
+  // Configure marked.js to open all links in new tabs safely
+  if (window.marked) {
+    const renderer = new window.marked.Renderer();
+    renderer.link = (href, title, text) => {
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${title || href}">${text} ↗</a>`;
+    };
+    window.marked.use({ renderer });
+  }
+
   const sendBtn = document.getElementById('send-msg');
   const input = document.getElementById('user-input');
 
-  if (sendBtn) {
-    sendBtn.addEventListener('click', () => sendMessage());
-  }
-  
+  if (sendBtn) sendBtn.addEventListener('click', () => sendMessage());
+
   if (input) {
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
 
-    // Dynamic Placeholder Rotation
+    // Buttery smooth placeholder rotation with opacity fade
     const placeholders = [
-      "e.g., How is the Prime Minister elected in Bharat?",
-      "e.g., What is the difference between Lok Sabha & Rajya Sabha?",
-      "e.g., How do I register for Panchayat elections?",
-      "e.g., Who elects the Chief Minister?",
-      "e.g., Who is the Chief Election Commissioner of India?",
-      "e.g., How do I apply for Form 6 in West Bengal?"
+      "e.g., How do I register as a first-time voter using Form 6?",
+      "e.g., What is the difference between Lok Sabha & Vidhan Sabha?",
+      "e.g., Who conducts Panchayat elections — ECI or State?",
+      "e.g., I moved cities. How do I transfer my vote? (Form 8)",
+      "e.g., How is the Prime Minister of Bharat elected?",
+      "e.g., What is Special Intensive Revision (SIR) of electoral rolls?",
+      "e.g., How can I find my polling booth on election day?",
+      "e.g., What valid IDs can I use to vote at the booth?",
+      "e.g., How is the President of Bharat elected?",
+      "e.g., What is Form 7 and when do I use it?",
     ];
     let pIndex = 0;
     setInterval(() => {
-      pIndex = (pIndex + 1) % placeholders.length;
-      input.setAttribute('placeholder', placeholders[pIndex]);
-    }, 3500);
+      input.style.transition = 'opacity 0.5s ease';
+      input.style.opacity = '0.25';
+      setTimeout(() => {
+        pIndex = (pIndex + 1) % placeholders.length;
+        input.setAttribute('placeholder', placeholders[pIndex]);
+        input.style.opacity = '1';
+      }, 500);
+    }, 4000);
   }
 
   // Location Toggle Logic
   const btnRural = document.getElementById('toggle-rural');
   const btnUrban = document.getElementById('toggle-urban');
-  
   if (btnRural && btnUrban) {
     btnRural.addEventListener('click', () => updateLocationContext('rural'));
     btnUrban.addEventListener('click', () => updateLocationContext('urban'));
   }
 
   // Timeline Item Click logic
-  const items = document.querySelectorAll('.timeline-item');
-  items.forEach(item => {
+  document.querySelectorAll('.timeline-item').forEach(item => {
     item.addEventListener('click', () => {
-      items.forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.timeline-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
     });
   });
@@ -79,13 +93,26 @@ function updateLocationContext(type) {
 }
 
 /**
+ * Parses structured AI response into thinking, answer, and references parts.
+ */
+function parseAIResponse(raw) {
+  const thinkingMatch = raw.match(/\[THINKING\]([\s\S]*?)\[\/THINKING\]/);
+  const answerMatch = raw.match(/\[ANSWER\]([\s\S]*?)\[\/ANSWER\]/);
+  const referencesMatch = raw.match(/\[REFERENCES\]([\s\S]*?)\[\/REFERENCES\]/);
+  return {
+    thinking: thinkingMatch ? thinkingMatch[1].trim() : null,
+    answer: answerMatch ? answerMatch[1].trim() : raw,
+    references: referencesMatch ? referencesMatch[1].trim() : null,
+  };
+}
+
+/**
  * Handles sending a message in the chat
  */
 async function sendMessage() {
   const input = document.getElementById('user-input');
   const chatMessages = document.getElementById('chat-messages');
   const text = input.value.trim();
-
   if (!text) return;
 
   // Append user message
@@ -93,52 +120,89 @@ async function sendMessage() {
   userDiv.className = 'message user fade-in';
   userDiv.textContent = text;
   chatMessages.appendChild(userDiv);
-
   input.value = '';
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Add Skeleton Loader indicator
+  // Skeleton Loader
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'message ai skeleton-message fade-in';
   loadingDiv.innerHTML = `
-    <div class="skeleton skeleton-text" style="width: 100px;"></div>
-    <div class="skeleton skeleton-text" style="width: 200px;"></div>
+    <div class="skeleton skeleton-text" style="width:65%;"></div>
+    <div class="skeleton skeleton-text" style="width:80%;margin-top:8px;"></div>
+    <div class="skeleton skeleton-text" style="width:50%;margin-top:8px;"></div>
   `;
   chatMessages.appendChild(loadingDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Call Vertex AI (via our server)
-  const aiResponse = await askJanMat(text);
-  
-  // Remove loading and append real AI response
+  const aiRaw = await askJanMat(text);
   chatMessages.removeChild(loadingDiv);
+
+  // Parse structured sections
+  const { thinking, answer, references } = parseAIResponse(aiRaw);
+  const parsedAnswer = window.marked ? window.marked.parse(answer) : answer;
+  const parsedRefs = references && window.marked ? window.marked.parse(references) : (references || '');
+
   const aiDiv = document.createElement('div');
   aiDiv.className = 'message ai fade-in markdown-body';
-  
-  // Parse Markdown using the marked library we just added
-  const parsedHtml = window.marked ? window.marked.parse(aiResponse) : aiResponse;
-  aiDiv.innerHTML = parsedHtml;
-  
-  // Add Feedback Buttons
+
+  let html = '';
+
+  // 1. Thinking Toggle
+  if (thinking) {
+    const thinkId = `think-${Date.now()}`;
+    html += `
+      <div class="thinking-toggle" onclick="document.getElementById('${thinkId}').classList.toggle('open')">
+        <span>🧠</span> Model Reasoning <span class="think-chevron">▾</span>
+      </div>
+      <div class="thinking-panel" id="${thinkId}">
+        <p>${thinking}</p>
+      </div>`;
+  }
+
+  // 2. Main Answer
+  html += `<div class="ai-answer">${parsedAnswer}</div>`;
+
+  // 3. Official Sources
+  if (references) {
+    html += `
+      <div class="references-panel">
+        <div class="ref-header">📚 Official Sources</div>
+        <div class="ref-body">${parsedRefs}</div>
+      </div>`;
+  }
+
+  aiDiv.innerHTML = html;
+
+  // 4. Feedback Buttons
   const feedbackDiv = document.createElement('div');
   feedbackDiv.className = 'feedback-group';
   feedbackDiv.innerHTML = `
-    <button class="feedback-btn" style="background:transparent; border:none; cursor:pointer; font-size:1.2rem; transition:transform 0.2s;" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👍</button>
-    <button class="feedback-btn" style="background:transparent; border:none; cursor:pointer; font-size:1.2rem; transition:transform 0.2s;" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👎</button>
+    <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👍</button>
+    <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👎</button>
   `;
   aiDiv.appendChild(feedbackDiv);
-  
+
   chatMessages.appendChild(aiDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Log session to Firebase
-  logChatSession(text, aiResponse);
+  logChatSession(text, answer);
 }
 
 /**
- * Handles user feedback on AI responses
+ * Called when a suggestion chip is clicked — auto-fills and sends the question
+ */
+window.askChip = (question) => {
+  const input = document.getElementById('user-input');
+  if (input) {
+    input.value = question;
+    sendMessage();
+  }
+};
+
+/**
+ * Handles user feedback
  */
 window.handleFeedback = (query, type) => {
-  console.log(`Feedback received: ${type} for query: ${query}`);
-  alert("Namaste! Thank you for your feedback.");
+  console.log(`Feedback: ${type} for: ${query}`);
+  alert("Namaste! Thank you for your feedback, Sir/Ma'am.");
 };

@@ -142,13 +142,13 @@ nav a:hover {
 
 .mission-tag {
   display: inline-block;
-  padding: 0.6rem 1.4rem;
-  font-size: 0.85rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   color: var(--national-saffron);
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
   cursor: default;
   border-radius: 50px;
 }
@@ -546,6 +546,54 @@ nav a:hover {
   font-weight: 700;
 }
 
+/* ── Suggestion Chips ── */
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 0 4px;
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 153, 51, 0.3);
+  background: rgba(255, 153, 51, 0.07);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: var(--font-body);
+  text-align: left;
+  line-height: 1.2;
+}
+
+.chip span {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: rgba(255, 153, 51, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chip:hover {
+  background: rgba(255, 153, 51, 0.18);
+  border-color: rgba(255, 153, 51, 0.7);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 153, 51, 0.2);
+}
+
+.chip:hover span {
+  color: rgba(255, 200, 100, 0.9);
+}
+
 /* Feedback buttons container styling */
 .feedback-group {
   display: flex;
@@ -554,6 +602,104 @@ nav a:hover {
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.feedback-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+/* ── Thinking Toggle ── */
+.thinking-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 8px;
+  width: fit-content;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.thinking-toggle:hover {
+  color: var(--national-saffron);
+  border-color: rgba(255, 153, 51, 0.3);
+}
+.think-chevron {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+.thinking-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.3s ease;
+  opacity: 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid rgba(255, 153, 51, 0.4);
+  padding: 0 10px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 10px;
+}
+.thinking-panel.open {
+  max-height: 300px;
+  opacity: 1;
+  padding: 8px 10px;
+}
+.thinking-panel.open ~ .thinking-toggle .think-chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Official Sources Panel ── */
+.references-panel {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+}
+.ref-header {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.ref-body ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.82rem;
+}
+.ref-body li {
+  margin-bottom: 3px;
+}
+
+/* ── Clickable AI Links ── */
+.ai-link {
+  color: var(--national-saffron);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255, 153, 51, 0.5);
+  transition: color 0.2s, border-color 0.2s;
+  font-weight: 500;
+}
+.ai-link:hover {
+  color: #fff;
+  border-color: #fff;
+}
+
+/* ── Markdown body links fallback ── */
+.markdown-body a {
+  color: var(--national-saffron);
+  text-decoration: underline;
+}
+
 
 /* Magic Glowing Aura Effect (Indian Tricolor + Ashoka Blue) */
 .magic-glow {
