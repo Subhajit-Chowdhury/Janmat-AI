@@ -515,6 +515,46 @@ nav a:hover {
   border-bottom-right-radius: 2px;
 }
 
+/* Markdown Styling for AI Responses */
+.markdown-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--national-saffron);
+  font-size: 1.1rem;
+}
+
+.markdown-body p {
+  margin-bottom: 0.8rem;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.3rem;
+}
+
+.markdown-body strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Feedback buttons container styling */
+.feedback-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Magic Glowing Aura Effect (Indian Tricolor + Ashoka Blue) */
 .magic-glow {
   position: relative;

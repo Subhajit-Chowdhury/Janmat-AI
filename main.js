@@ -98,15 +98,18 @@ async function sendMessage() {
   // Remove loading and append real AI response
   chatMessages.removeChild(loadingDiv);
   const aiDiv = document.createElement('div');
-  aiDiv.className = 'message ai fade-in';
-  aiDiv.textContent = aiResponse;
+  aiDiv.className = 'message ai fade-in markdown-body';
+  
+  // Parse Markdown using the marked library we just added
+  const parsedHtml = window.marked ? window.marked.parse(aiResponse) : aiResponse;
+  aiDiv.innerHTML = parsedHtml;
   
   // Add Feedback Buttons
   const feedbackDiv = document.createElement('div');
   feedbackDiv.className = 'feedback-group';
   feedbackDiv.innerHTML = `
-    <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')">👍</button>
-    <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')">👎</button>
+    <button class="feedback-btn" style="background:transparent; border:none; cursor:pointer; font-size:1.2rem; transition:transform 0.2s;" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👍</button>
+    <button class="feedback-btn" style="background:transparent; border:none; cursor:pointer; font-size:1.2rem; transition:transform 0.2s;" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👎</button>
   `;
   aiDiv.appendChild(feedbackDiv);
   
