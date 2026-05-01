@@ -16,6 +16,7 @@ This project strictly follows the "Google Services Only" mandate for PromptWars 
 - **Chosen Vertical**: Indian Election Process Education.
 - **Problem**: Complexity of ECI forms (Form 6, 7, 8) and lack of a centralized "journey-based" guide for young voters.
 - **Solution**: A premium, interactive portal that simplifies the bureaucratic process into a visual timeline and an intelligent AI companion.
+- **Accessibility Focus**: Implemented a dynamic Rural vs. Urban toggle that adapts the timeline steps (Gram Panchayat vs. Ward Office) to cater to India's diverse demographic needs, explicitly solving for "easy-to-follow" instructions for everyone.
 
 ---
 

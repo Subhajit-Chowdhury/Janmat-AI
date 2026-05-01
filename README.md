@@ -17,6 +17,7 @@ Our objective was to design a solution that transforms this complex bureaucratic
 
 ### 🛠️ The Architecture
 We developed **JanMat AI** using a disciplined "brick-by-brick" implementation strategy:
+- **Context-Aware Demographic Toggle**: A brilliant 'Rural vs. Urban' interactive switch that dynamically alters the timeline advice (e.g., Gram Panchayat vs. Ward Office) to account for India's diverse accessibility needs.
 - **Premium UI/UX**: A high-end, glassmorphic design system built with Vanilla CSS ensures the platform feels modern and accessible.
 - **Interactive ECI Timeline**: A visual, step-by-step roadmap of the **Election Commission of India (ECI)** process for interactive exploration.
 - **Gemini 1.5 Flash**: Architected a conversational interface with a structured **system instruction** (Role-based, Constrained, and Few-shot ready) to provide expert-level civic guidance.
