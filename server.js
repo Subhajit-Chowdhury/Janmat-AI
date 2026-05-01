@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -13,12 +13,16 @@ const app = express();
 app.use(express.json());
 const port = process.env.PORT || 8080;
 
-// Initialize Vertex AI
-const project = process.env.GCP_PROJECT_ID || 'janmat-ai';
-const location = process.env.GCP_LOCATION || 'us-central1';
-const vertexAI = new VertexAI({ project: project, location: location });
+// Initialize Google Generative AI
+const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
-const generativeModel = vertexAI.getGenerativeModel({
+if (!apiKey) {
+  console.warn("⚠️ WARNING: GEMINI_API_KEY (or VITE_GEMINI_API_KEY) is not set in the environment variables!");
+  console.warn("Please add your Gemini API Key to a .env file to enable the AI chat feature.");
+}
+
+const genAI = new GoogleGenerativeAI(apiKey || 'missing-key');
+const generativeModel = genAI.getGenerativeModel({
   model: 'gemini-1.5-flash',
   systemInstruction: {
     role: 'system',
@@ -47,18 +51,25 @@ STRICT CONSTRAINTS:
 // AI Chat Endpoint
 app.post('/api/chat', async (req, res) => {
   try {
+    if (!apiKey) {
+      return res.status(500).json({ 
+        error: 'API Key Error: GEMINI_API_KEY (or VITE_GEMINI_API_KEY) is missing. Please configure it in the .env file.' 
+      });
+    }
+
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
 
     const chat = generativeModel.startChat();
     const result = await chat.sendMessage(prompt);
-    const response = result.response;
-    const text = response.candidates[0].content.parts[0].text;
+    const text = result.response.text();
     
     res.json({ response: text });
   } catch (error) {
-    console.error('Vertex AI Error:', error);
-    res.status(500).json({ error: 'The JanMat AI service is currently unavailable. Please try again later.' });
+    console.error('Generative AI Error:', error);
+    res.status(500).json({ 
+      error: 'The JanMat AI service is currently unavailable. Please try again later. Details: ' + error.message 
+    });
   }
 });
 
@@ -70,5 +81,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`JanMat AI Server running on port ${port} with Vertex AI`);
+  console.log(`JanMat AI Server running on port ${port} with Google Generative AI`);
 });

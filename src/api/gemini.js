@@ -1,5 +1,5 @@
 /**
- * Calls the JanMat AI Server (Vertex AI Backend)
+ * Calls the JanMat AI Server (Generative AI Backend)
  * @param {string} prompt - User's query
  * @returns {Promise<string>} - AI response
  */
@@ -15,14 +15,15 @@ export async function askJanMat(prompt) {
       body: JSON.stringify({ prompt }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error(data.error || 'Network response was not ok');
     }
 
-    const data = await response.json();
     return data.response;
   } catch (error) {
     console.error('Chat Error:', error);
-    return "Namaste! I'm having a bit of a technical glitch. Please try asking again in a moment.";
+    return `Namaste! I'm having a bit of a technical glitch. Error details: ${error.message}`;
   }
 }
