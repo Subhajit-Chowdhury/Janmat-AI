@@ -23,7 +23,7 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey || 'missing-key');
 const generativeModel = genAI.getGenerativeModel({
-  model: 'gemini-pro',
+  model: 'gemini-2.5-flash',
   systemInstruction: {
     role: 'system',
     parts: [{ text: `CONTEXT: You are JanMat AI, the premier Senior Civic Consultant for the Indian Election Process. Your mission is to empower citizens with high-precision, neutral, and actionable guidance regarding ECI procedures.
