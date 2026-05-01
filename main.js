@@ -17,6 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
+
+    // Dynamic Placeholder Rotation
+    const placeholders = [
+      "e.g., How is the Prime Minister elected in Bharat?",
+      "e.g., What is the difference between Lok Sabha & Rajya Sabha?",
+      "e.g., How do I register for Panchayat elections?",
+      "e.g., Who elects the Chief Minister?",
+      "e.g., Who is the Chief Election Commissioner of India?",
+      "e.g., How do I apply for Form 6 in West Bengal?"
+    ];
+    let pIndex = 0;
+    setInterval(() => {
+      pIndex = (pIndex + 1) % placeholders.length;
+      input.setAttribute('placeholder', placeholders[pIndex]);
+    }, 3500);
   }
 
   // Location Toggle Logic
