@@ -146,14 +146,46 @@ if (USE_VERTEX_AI) {
 const sessionStore = new Map();
 const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
-function getSessionId(req) {
-  return req.headers['x-session-id'] || req.ip || 'default';
+// Concurrency limiter — max simultaneous Gemini API calls
+// Gemini free tier = 15 RPM; we cap at 8 concurrent to stay safe
+const MAX_CONCURRENT = 8;
+let activeRequests = 0;
+const requestQueue = [];
+
+function acquireSlot() {
+  return new Promise((resolve) => {
+    if (activeRequests < MAX_CONCURRENT) {
+      activeRequests++;
+      resolve();
+    } else {
+      requestQueue.push(resolve);
+    }
+  });
 }
 
-function cleanupSession(sessionId) {
-  setTimeout(() => {
-    sessionStore.delete(sessionId);
-  }, SESSION_TTL_MS);
+function releaseSlot() {
+  activeRequests--;
+  if (requestQueue.length > 0) {
+    const next = requestQueue.shift();
+    activeRequests++;
+    next();
+  }
+}
+
+// Retry with exponential backoff for rate-limit errors
+async function callWithRetry(fn, retries = 2, delayMs = 1500) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isRateLimit = err?.status === 429 || err?.message?.includes('429') || err?.message?.toLowerCase().includes('quota');
+      if (isRateLimit && attempt < retries) {
+        await new Promise(r => setTimeout(r, delayMs * Math.pow(2, attempt)));
+        continue;
+      }
+      throw err;
+    }
+  }
 }
 
 // Request deduplication map (prompt hash → promise)
@@ -183,29 +215,33 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const promise = (async () => {
-      // Get or create chat history for this session
-      let history = sessionStore.get(sessionId);
-      if (!history) {
-        history = [];
-        cleanupSession(sessionId);
+      // Wait for a concurrency slot (queues if >MAX_CONCURRENT active)
+      await acquireSlot();
+      try {
+        // Get or create chat history for this session
+        let history = sessionStore.get(sessionId) || [];
+        if (!sessionStore.has(sessionId)) {
+          cleanupSession(sessionId);
+        }
+
+        // Create chat with history and send with retry backoff
+        const text = await callWithRetry(async () => {
+          const chat = generativeModel.startChat({ history });
+          const result = await chat.sendMessage(trimmedPrompt);
+          return result.response.text();
+        });
+
+        // Update history — fix: mutate the array directly, don't reassign
+        history.push({ role: 'user', parts: [{ text: trimmedPrompt }] });
+        history.push({ role: 'model', parts: [{ text }] });
+        // Keep last 10 Q&A pairs (20 messages) to save tokens
+        if (history.length > 20) history.splice(0, history.length - 20);
+        sessionStore.set(sessionId, history);
+
+        return res.json({ response: text });
+      } finally {
+        releaseSlot();
       }
-
-      // Create chat with history
-      const chat = generativeModel.startChat({ history });
-
-      // Send message
-      const result = await chat.sendMessage(trimmedPrompt);
-      const text = result.response.text();
-
-      // Update history (keep last 10 exchanges to save tokens)
-      history.push({ role: 'user', parts: [{ text: trimmedPrompt }] });
-      history.push({ role: 'model', parts: [{ text: text }] });
-      if (history.length > 20) {
-        history = history.slice(-20); // keep last 10 Q&A pairs
-      }
-      sessionStore.set(sessionId, history);
-
-      return res.json({ response: text });
     })();
 
     pendingRequests.set(requestKey, promise);
