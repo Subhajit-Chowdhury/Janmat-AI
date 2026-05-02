@@ -122,7 +122,7 @@ if (USE_VERTEX_AI) {
     location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
   });
   generativeModel = vertexAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.0-flash',
     systemInstruction: {
       role: 'system',
       parts: [{ text: SYSTEM_INSTRUCTION }]
@@ -132,7 +132,7 @@ if (USE_VERTEX_AI) {
   // Google Gemini API (fallback option)
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   generativeModel = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.0-flash',
     systemInstruction: {
       role: 'system',
       parts: [{ text: SYSTEM_INSTRUCTION }]
