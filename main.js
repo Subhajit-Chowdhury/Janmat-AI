@@ -205,10 +205,10 @@ function parseAIResponse(raw) {
 
 // Generate stable session ID
 function getSessionId() {
-  let sessionId = localStorage.getItem('janmat_session_id');
+  let sessionId = localStorage.getItem('electai_session_id');
   if (!sessionId) {
     sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('janmat_session_id', sessionId);
+    localStorage.setItem('electai_session_id', sessionId);
   }
   return sessionId;
 }
@@ -230,7 +230,7 @@ function showSkeletonLoader() {
       <div class="skeleton-line skeleton-line--medium"></div>
       <div class="skeleton-line skeleton-line--short"></div>
       <div class="skeleton-line skeleton-line--medium"></div>
-      <div class="skeleton-typing-label">✨ JanMat AI is thinking...</div>
+      <div class="skeleton-typing-label">✨ ElectAI is thinking...</div>
     </div>
   `;
   chatMessages.appendChild(skeletonDiv);
@@ -665,7 +665,7 @@ window.clearChat = function() {
   if (container) container.classList.remove('has-messages');
   if (suggestions) suggestions.style.display = '';
   currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  localStorage.setItem('janmat_session_id', currentSessionId);
+  localStorage.setItem('electai_session_id', currentSessionId);
   hideScrollToBottom();
 };
 
@@ -704,7 +704,7 @@ function getDynamicGreeting() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('JanMat AI Initialized');
+  console.log('ElectAI Initialized');
 
   // Set dynamic greeting
   const greeting = getDynamicGreeting();

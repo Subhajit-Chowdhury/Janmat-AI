@@ -27,7 +27,7 @@ export async function logChatSession(userQuery, aiResponse) {
       query: userQuery,
       response: aiResponse,
       timestamp: serverTimestamp(),
-      platform: "JanMat AI - Web"
+      platform: "ElectAI - Web"
     });
   } catch (error) {
     console.error("Firebase Logging Error:", error);

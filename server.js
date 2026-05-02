@@ -229,5 +229,5 @@ app.get('*', (req, res) => {
 
 app.listen(port, () => {
   const mode = USE_VERTEX_AI ? 'Vertex AI' : 'Google Gemini';
-  console.log(`JanMat AI Server running on port ${port} with ${mode}`);
+  console.log(`ElectAI Server running on port ${port} with ${mode}`);
 });

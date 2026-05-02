@@ -219,25 +219,26 @@
 .welcome-suggestions-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px;
+  margin-top: 14px;
   padding: 0 4px;
 }
 
 @media (max-width: 600px) {
   .welcome-suggestions-row {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
 
 .suggestion-card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 14px 18px;
-  border-radius: 16px;
+  padding: 11px 14px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
   transition: all 0.25s ease;
   text-align: left;
@@ -246,9 +247,9 @@
 
 .suggestion-card:hover {
   background: rgba(255, 153, 51, 0.08);
-  border-color: rgba(255, 153, 51, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 153, 51, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
 }
 
 .card-icon {
