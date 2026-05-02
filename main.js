@@ -324,17 +324,41 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 
 function startRecording() {
   if (!recognition) {
-    alert('Speech recognition is not supported in this browser.');
+    alert('Speech recognition is not supported in this browser. Please try Chrome or Edge.');
     return;
   }
+  const micBtn = document.getElementById('mic-btn');
+  micBtn.classList.add('recording');
   document.getElementById('record-overlay').classList.remove('hidden');
-  recognition.start();
+  try {
+    recognition.start();
+  } catch (e) {
+    console.error('Recognition already started', e);
+  }
 }
 
 function stopRecording() {
+  const micBtn = document.getElementById('mic-btn');
+  if (micBtn) micBtn.classList.remove('recording');
   document.getElementById('record-overlay').classList.add('hidden');
-  if (recognition) recognition.stop();
+  if (recognition) {
+    try { recognition.stop(); } catch (e) {}
+  }
 }
+
+// Initial Listener Setup
+document.addEventListener('DOMContentLoaded', () => {
+  const micBtn = document.getElementById('mic-btn');
+  if (micBtn) {
+    micBtn.addEventListener('click', () => {
+      if (micBtn.classList.contains('recording')) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    });
+  }
+});
 
 // Main send message function
 async function sendMessage(manualText = null) {
@@ -441,8 +465,16 @@ async function sendMessage(manualText = null) {
           <span class="msg-timestamp">${timestamp}</span>
         </div>
         <div class="action-right">
-          <button class="action-msg-btn listen-btn" onclick="speakMessage('${msgId}')" title="Listen to response">🔊 Listen</button>
-          <button class="action-msg-btn copy-msg-btn" onclick="copyMessageText('${msgId}')" title="Copy response">📋 Copy</button>
+          <div class="tts-container" id="tts-container-${msgId}">
+            <button class="action-msg-btn listen-btn" onclick="speakMessage('${msgId}')" title="Listen to response">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>
+              Listen
+            </button>
+          </div>
+          <button class="action-msg-btn copy-msg-btn" onclick="copyMessageText('${msgId}')" title="Copy response">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg>
+            Copy
+          </button>
         </div>
       </div>`;
 
@@ -510,17 +542,46 @@ window.handleFeedback = (btn) => {
   }, 2000);
 };
 
-// Text to Speech
+// ── Enhanced Text to Speech ──
 let currentUtterance = null;
+const synth = window.speechSynthesis;
+
+const LANG_VOICE_MAP = {
+  'hi': ['hi-IN', 'Google हिन्दी'],
+  'bn': ['bn-IN', 'Google বাংলা'],
+  'ta': ['ta-IN', 'Google தமிழ்'],
+  'te': ['te-IN', 'Google తెలుగు'],
+  'kn': ['kn-IN', 'Google ಕನ್ನಡ'],
+  'ml': ['ml-IN', 'Google മലയാളം'],
+  'mr': ['mr-IN', 'Google मराठी'],
+  'gu': ['gu-IN', 'Google ગુજરાતી'],
+  'pa': ['pa-IN', 'Google ਪੰਜਾਬੀ'],
+  'or': ['or-IN', 'Google ଓଡ଼ିଆ'],
+  'as': ['as-IN', 'Google অসমীয়া'],
+  'ur': ['ur-PK', 'Google اردو'],
+  'en': ['en-IN', 'Google US English']
+};
+
+function getBestVoice(langCode) {
+  const voices = synth.getVoices();
+  const target = LANG_VOICE_MAP[langCode] || ['en-IN', 'Google US English'];
+  
+  // Try to find exact match or "Google" natural voice
+  return voices.find(v => v.lang === target[0] && (v.name.includes('Google') || v.name.includes('Natural'))) 
+         || voices.find(v => v.lang.startsWith(langCode)) 
+         || voices.find(v => v.lang.includes('IN'))
+         || voices[0];
+}
+
 window.speakMessage = function(msgId) {
   const msgEl = document.getElementById(msgId);
   if (!msgEl) return;
-  
   const text = msgEl.querySelector('.ai-answer').innerText;
   
-  if (window.speechSynthesis.speaking) {
-    window.speechSynthesis.cancel();
+  if (synth.speaking) {
+    synth.cancel();
     if (currentUtterance && currentUtterance.msgId === msgId) {
+      updateTTSUI(msgId, 'idle');
       currentUtterance = null;
       return;
     }
@@ -528,14 +589,71 @@ window.speakMessage = function(msgId) {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.msgId = msgId;
-  
-  // Basic language detection for TTS
-  if (/[अ-ह]/.test(text)) utterance.lang = 'hi-IN';
-  else if (/[অ-হ]/.test(text)) utterance.lang = 'bn-IN';
-  else utterance.lang = 'en-IN';
 
-  window.speechSynthesis.speak(utterance);
+  // Detect Language
+  let lang = 'en';
+  if (/[अ-ह]/.test(text)) lang = 'hi';
+  else if (/[অ-হ]/.test(text)) lang = 'bn';
+  else if (/[அ-ஹ]/.test(text)) lang = 'ta';
+  else if (/[అ-హ]/.test(text)) lang = 'te';
+  
+  const voice = getBestVoice(lang);
+  if (voice) {
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+  }
+
+  utterance.onstart = () => updateTTSUI(msgId, 'playing');
+  utterance.onpause = () => updateTTSUI(msgId, 'paused');
+  utterance.onresume = () => updateTTSUI(msgId, 'playing');
+  utterance.onend = () => {
+    updateTTSUI(msgId, 'idle');
+    currentUtterance = null;
+  };
+
+  synth.speak(utterance);
   currentUtterance = utterance;
+};
+
+function updateTTSUI(msgId, state) {
+  const container = document.getElementById(`tts-container-${msgId}`);
+  if (!container) return;
+
+  if (state === 'idle') {
+    container.innerHTML = `
+      <button class="action-msg-btn listen-btn" onclick="speakMessage('${msgId}')" title="Listen">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/></svg>
+        Listen
+      </button>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="tts-controls">
+      <button class="tts-btn ${state === 'playing' ? 'active' : ''}" onclick="toggleTTSPause()" title="${state === 'playing' ? 'Pause' : 'Resume'}">
+        ${state === 'playing' ? 
+          '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>' : 
+          '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>'}
+      </button>
+      <button class="tts-btn" onclick="stopTTS()" title="Stop">
+        <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M18,18H6V6H18V18Z"/></svg>
+      </button>
+      <span class="tts-status-text">${state}</span>
+    </div>
+  `;
+}
+
+window.toggleTTSPause = function() {
+  if (synth.paused) synth.resume();
+  else synth.pause();
+};
+
+window.stopTTS = function() {
+  synth.cancel();
+  if (currentUtterance) {
+    updateTTSUI(currentUtterance.msgId, 'idle');
+    currentUtterance = null;
+  }
 };
 
 // Clear chat

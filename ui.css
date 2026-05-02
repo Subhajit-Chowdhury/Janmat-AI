@@ -663,15 +663,26 @@
    ═══════════════════════════════════════ */
 .input-container-floating {
   position: relative;
-  background: rgba(38, 38, 38, 0.8) !important; /* Slightly darker/more solid */
+  background: rgba(38, 38, 38, 0.9) !important;
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  /* Default Glow - subtle tricolor gradient */
+  border: 1px solid transparent !important;
+  background: linear-gradient(rgba(38, 38, 38, 0.9), rgba(38, 38, 38, 0.9)) padding-box,
+              linear-gradient(90deg, rgba(255,153,51,0.3), rgba(255,255,255,0.3), rgba(19,136,8,0.3)) border-box !important;
   border-radius: 32px !important;
-  padding: 8px 12px !important;
+  padding: 8px 16px !important;
   display: flex !important;
-  align-items: center !important; /* Vertical centering fix */
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  align-items: center !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,153,51,0.1);
+}
+
+/* Active Glow on focus */
+.input-container-floating:focus-within {
+  background: linear-gradient(rgba(38, 38, 38, 1), rgba(38, 38, 38, 1)) padding-box,
+              linear-gradient(90deg, #FF9933, #ffffff, #138808) border-box !important;
+  box-shadow: 0 0 30px rgba(255, 153, 51, 0.25);
+  transform: translateY(-2px);
 }
 
 .action-btn.plus-btn {
@@ -867,6 +878,49 @@
 .skeleton-line--long  { width: 85%; animation-delay: 0s; }
 .skeleton-line--medium { width: 60%; animation-delay: 0.15s; }
 .skeleton-line--short  { width: 40%; animation-delay: 0.3s; }
+
+/* ── TTS Control Bar ── */
+.tts-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: fit-content;
+}
+
+.tts-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+}
+
+.tts-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tts-btn.active {
+  color: #FF9933;
+}
+
+.tts-btn svg {
+  display: block;
+}
+
+.action-msg-btn svg {
+  margin-right: 4px;
+}
 
 @keyframes skeleton-shimmer {
   0%   { background-position: 200% 0; }
