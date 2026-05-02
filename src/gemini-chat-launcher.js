@@ -142,7 +142,7 @@ export class GeminiChatLauncher {
           </div>
 
           <div class="launcher-footer">
-            <p>Powered by Gemini 1.5 Flash • Secure • Multilingual 🇮🇳</p>
+            <p>Powered by Gemini 2.0 Flash • Grounded by Google Search • Secure • Multilingual 🇮🇳</p>
           </div>
         </div>
       </div>

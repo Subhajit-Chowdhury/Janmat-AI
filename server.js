@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { VertexAI } from '@google-cloud/vertexai';
 
 dotenv.config();
 
@@ -114,37 +113,45 @@ Delhi SIR 2025: ceodelhi.gov.in
 // Initialize AI based on configuration
 let generativeModel;
 
-if (USE_VERTEX_AI) {
-  // Vertex AI (recommended for production)
-  console.log('Using Vertex AI with project:', process.env.GOOGLE_CLOUD_PROJECT);
-  const vertexAI = new VertexAI({
-    project: process.env.GOOGLE_CLOUD_PROJECT,
-    location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
-  });
-  generativeModel = vertexAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    systemInstruction: {
-      role: 'system',
-      parts: [{ text: SYSTEM_INSTRUCTION }]
-    }
-  });
-} else if (GEMINI_API_KEY) {
-  // Google Gemini API (fallback option)
+if (GEMINI_API_KEY) {
+  // Use @google/generative-ai which supports both AI Studio and Google Cloud API Keys
+  // This resolves the "GoogleAuthError: Unable to authenticate your request"
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+  
+  // Configure model with premium Grounding (Google Search)
   generativeModel = genAI.getGenerativeModel({
     model: 'gemini-2.0-flash',
+    tools: [{ googleSearch: {} }], // Enable real-time Google Search grounding
     systemInstruction: {
       role: 'system',
       parts: [{ text: SYSTEM_INSTRUCTION }]
     }
   });
+  
+  const mode = USE_VERTEX_AI ? 'Vertex AI Key' : 'Gemini Key';
+  console.log(`Using ${mode} with project: ${process.env.GOOGLE_CLOUD_PROJECT || 'default'}`);
 } else {
-  console.warn("⚠️ WARNING: Neither Vertex AI nor Gemini API key is configured!");
+  console.warn("⚠️ WARNING: GEMINI_API_KEY is not configured!");
 }
 
 // In-memory conversation store (sessionId → chat history)
 const sessionStore = new Map();
 const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+// Helper: Extract session ID from headers
+function getSessionId(req) {
+  return req.headers['x-session-id'] || 'default-session';
+}
+
+// Helper: Initialize or cleanup old sessions
+function cleanupSession(sessionId) {
+  // Clear other sessions if memory gets too high (basic cleanup)
+  if (sessionStore.size > 1000) {
+    const firstKey = sessionStore.keys().next().value;
+    sessionStore.delete(firstKey);
+  }
+  sessionStore.set(sessionId, []);
+}
 
 // Concurrency limiter — max simultaneous Gemini API calls
 // Gemini free tier = 15 RPM; we cap at 8 concurrent to stay safe
@@ -214,7 +221,7 @@ app.post('/api/chat', async (req, res) => {
       return pendingRequests.get(requestKey);
     }
 
-    const promise = (async () => {
+    const chatAction = async () => {
       // Wait for a concurrency slot (queues if >MAX_CONCURRENT active)
       await acquireSlot();
       try {
@@ -231,23 +238,31 @@ app.post('/api/chat', async (req, res) => {
           return result.response.text();
         });
 
-        // Update history — fix: mutate the array directly, don't reassign
+        // Update history
         history.push({ role: 'user', parts: [{ text: trimmedPrompt }] });
         history.push({ role: 'model', parts: [{ text }] });
-        // Keep last 10 Q&A pairs (20 messages) to save tokens
         if (history.length > 20) history.splice(0, history.length - 20);
         sessionStore.set(sessionId, history);
 
-        return res.json({ response: text });
+        return { response: text };
       } finally {
         releaseSlot();
       }
-    })();
+    };
+
+    const promise = chatAction()
+      .then(data => res.json(data))
+      .catch(error => {
+        console.error('Generative AI Error:', error);
+        if (!res.headersSent) {
+          res.status(500).json({
+            error: 'AI service temporarily unavailable. ' + (error.message || '')
+          });
+        }
+      });
 
     pendingRequests.set(requestKey, promise);
     setTimeout(() => pendingRequests.delete(requestKey), 2000);
-
-    return promise;
   } catch (error) {
     console.error('Generative AI Error:', error);
     res.status(500).json({
