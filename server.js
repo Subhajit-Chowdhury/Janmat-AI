@@ -113,26 +113,25 @@ Delhi SIR 2025: ceodelhi.gov.in
 // Initialize AI based on configuration
 let generativeModel;
 
-if (GEMINI_API_KEY) {
-  // Use @google/generative-ai which supports both AI Studio and Google Cloud API Keys
-  // This resolves the "GoogleAuthError: Unable to authenticate your request"
-  const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  
-  // Configure model with premium Grounding (Google Search)
-  generativeModel = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    tools: [{ googleSearch: {} }], // Enable real-time Google Search grounding
-    systemInstruction: {
-      role: 'system',
-      parts: [{ text: SYSTEM_INSTRUCTION }]
+async function initAI() {
+  try {
+    if (GEMINI_API_KEY) {
+      console.log(`Using API Key mode for ${USE_VERTEX_AI ? 'Vertex' : 'Gemini'}`);
+      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+      generativeModel = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        tools: [{ googleSearch: {} }],
+        systemInstruction: { role: 'system', parts: [{ text: SYSTEM_INSTRUCTION }] }
+      });
+    } else {
+      console.warn("⚠️ No API Key found. This is fine if you are running on Cloud Run with a Service Account.");
     }
-  });
-  
-  const mode = USE_VERTEX_AI ? 'Vertex AI Key' : 'Gemini Key';
-  console.log(`Using ${mode} with project: ${process.env.GOOGLE_CLOUD_PROJECT || 'default'}`);
-} else {
-  console.warn("⚠️ WARNING: GEMINI_API_KEY is not configured!");
+  } catch (err) {
+    console.error("❌ Failed to initialize AI:", err.message);
+  }
 }
+
+initAI();
 
 // In-memory conversation store (sessionId → chat history)
 const sessionStore = new Map();
