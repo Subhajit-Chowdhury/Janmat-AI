@@ -768,12 +768,44 @@ window.copyMessageText = function(msgId) {
 // Dynamic greeting based on time of day
 function getDynamicGreeting() {
   const hour = new Date().getHours();
-  if (hour < 5) return { title: 'Burning the midnight oil? Let\'s learn! 🌙', sub: 'Your trusted AI guide for Indian elections is always awake.' };
-  if (hour < 12) return { title: 'Good Morning! Ready to learn? ☀️', sub: 'Start your day by understanding your voting power.' };
-  if (hour < 17) return { title: 'Good Afternoon! How can I help?', sub: 'Get instant answers about Indian elections — in any language.' };
-  if (hour < 21) return { title: 'Good Evening! Ask me anything 🌅', sub: 'Your AI-powered election assistant is here to help.' };
-  return { title: 'Good Night! Still curious? 🌙', sub: 'Ask about voter registration, polling booths & more.' };
+  if (hour < 5) return {
+    title: 'Still up? Democracy never sleeps, and neither do you 🌙',
+    sub: 'Your curiosity about elections at this hour is exactly what civic India needs.'
+  };
+  if (hour < 9) return {
+    title: 'Early riser, informed voter ☀️',
+    sub: 'Starting your day with election knowledge? That\'s the spirit of an active citizen.'
+  };
+  if (hour < 12) return {
+    title: 'Good Morning! Your vote is your voice 🗳️',
+    sub: 'Ask me anything about Indian elections — in Hindi, English, or any language.'
+  };
+  if (hour < 14) return {
+    title: 'Midday check-in — what\'s on your mind? 💡',
+    sub: 'From Form 6 to polling booths, I\'ve got all your election questions covered.'
+  };
+  if (hour < 17) return {
+    title: 'Good Afternoon! Ready to learn together? 📚',
+    sub: 'Millions of Indians don\'t know their voter rights. You\'re about to be different.'
+  };
+  if (hour < 19) return {
+    title: 'Evening vibes, civic minds 🌅',
+    sub: 'The best time to learn how your vote shapes India\'s future.'
+  };
+  if (hour < 21) return {
+    title: 'Good Evening! Ask me anything 🌆',
+    sub: 'Your AI-powered election assistant is here — always honest, always helpful.'
+  };
+  if (hour < 23) return {
+    title: 'Winding down, but still curious? 🌙',
+    sub: 'One question tonight could make you a more informed voter tomorrow.'
+  };
+  return {
+    title: 'Late night, deep questions — I respect that 🌟',
+    sub: 'The kind of citizen who learns about elections past midnight? India needs more of you.'
+  };
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('ElectAI Initialized');
