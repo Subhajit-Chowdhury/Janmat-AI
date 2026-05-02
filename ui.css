@@ -351,6 +351,9 @@
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important; /* Force vertical layout */
+  align-items: flex-start !important;
 }
 
 #home .ai-avatar {
@@ -373,6 +376,22 @@
   color: #d1d5db !important;
   font-size: 0.95rem !important;
   line-height: 1.75 !important;
+  width: 100%; /* Ensure full width */
+}
+
+/* ── RESPONSE CHIPS (Bottom alignment) ── */
+.response-chips {
+  width: 100%;
+  margin-top: 1.5rem !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  padding-left: 0 !important; /* Align with text */
+}
+
+.response-chips .chip {
+  flex: 0 1 auto !important;
+  max-width: 300px;
 }
 
 /* User Message */
