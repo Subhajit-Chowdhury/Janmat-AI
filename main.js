@@ -696,11 +696,11 @@ window.copyMessageText = function(msgId) {
 // Dynamic greeting based on time of day
 function getDynamicGreeting() {
   const hour = new Date().getHours();
-  if (hour < 5) return { title: 'Up late? Let\'s help you learn 🌙', sub: 'Your trusted AI guide for Indian elections' };
-  if (hour < 12) return { title: 'Good Morning! How can I help? ☀️', sub: 'Start your day by learning about your voting rights' };
-  if (hour < 17) return { title: 'Good Afternoon! What can I help with?', sub: 'Get instant answers about Indian elections — in any language' };
-  if (hour < 21) return { title: 'Good Evening! Ask me anything 🌅', sub: 'Your AI-powered election assistant is ready' };
-  return { title: 'Good Night! Still curious? 🌙', sub: 'Ask about voter registration, polling booths & more' };
+  if (hour < 5) return { title: 'Burning the midnight oil? Let\'s learn! 🌙', sub: 'Your trusted AI guide for Indian elections is always awake.' };
+  if (hour < 12) return { title: 'Good Morning! Ready to learn? ☀️', sub: 'Start your day by understanding your voting power.' };
+  if (hour < 17) return { title: 'Good Afternoon! How can I help?', sub: 'Get instant answers about Indian elections — in any language.' };
+  if (hour < 21) return { title: 'Good Evening! Ask me anything 🌅', sub: 'Your AI-powered election assistant is here to help.' };
+  return { title: 'Good Night! Still curious? 🌙', sub: 'Ask about voter registration, polling booths & more.' };
 }
 
 document.addEventListener('DOMContentLoaded', () => {
