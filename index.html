@@ -61,34 +61,59 @@
       </header>
 
       <main id="home" class="hero-section">
-        <div class="hero-content">
-          <h1 class="gradient-text">JanMat AI</h1>
-          <p class="subtitle">Your intelligent guide to the world's largest democracy. Ask anything about voting, registration, or ECI processes.</p>
-          
-          <!-- Primary Chat Interface -->
-          <div class="primary-chat magic-glow pulse-glow" id="chat">
+        <div class="chat-container-main fade-in">
+          <div class="chat-header">
+            <div class="chat-title">
+              <span class="pulse-icon"></span>
+              <h2>JanMat AI Assistant</h2>
+            </div>
+            <div class="language-selector">
+              <select id="lang-select" aria-label="Select Language">
+                <option value="en">English</option>
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="bn">বাংলা (Bengali)</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="mr">मराठी (Marathi)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="ur">اردو (Urdu)</option>
+                <option value="gu">ગુજરાતી (Gujarati)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="ml">മലയാളം (Malayalam)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="primary-chat" id="chat">
             <div class="chat-messages" id="chat-messages">
               <div class="message ai">
                 <div class="ai-avatar">AI</div>
                 <div class="ai-text">
-                  Namaste, Sir/Ma'am! 🙏<br><br>Main hoon aapka JanMat AI — aapka intelligent election guide.<br><br><strong>Aap poochh sakte hain:</strong><br>
-                  • "How do I register to vote for the first time?"<br>
-                  • "What's the difference between Lok Sabha and Vidhan Sabha?"<br>
-                  • "How is the Prime Minister elected?"<br><br>
-                  Kya aapko kuch poochhna hai aaj?
+                  <p><strong>Namaste!</strong> I am your JanMat AI election guide. 🙏</p>
+                  <p>How can I help you navigate the world's largest democracy today? You can ask me in any language!</p>
+                  <div class="welcome-suggestions">
+                    <button class="chip" onclick="askChip('How do I register to vote?')">🗳️ Register to Vote</button>
+                    <button class="chip" onclick="askChip('What is Form 6?')">📄 Form 6 Guide</button>
+                    <button class="chip" onclick="askChip('How to find my polling booth?')">📍 Find Booth</button>
+                  </div>
                 </div>
               </div>
-              <div class="suggestion-chips">
-                <button class="chip primary-chip" onclick="askChip('How do I register to vote for the first time using Form 6?')">📋 First Time Voter?</button>
-                <button class="chip primary-chip" onclick="askChip('What is the difference between Lok Sabha and Vidhan Sabha?')">🏛️ Lok Sabha vs Vidhan Sabha</button>
-                <button class="chip primary-chip" onclick="askChip('How is the Prime Minister of India elected after elections?')">👑 How PM is Elected</button>
-                <button class="chip primary-chip" onclick="askChip('What is Form 8 and when should I use it?')">📝 Form 8 Explained</button>
-              </div>
             </div>
+            
             <div class="ai-input-wrapper">
-              <div class="chat-input-group">
-                <input type="text" id="user-input" placeholder="Type your question about voting, elections, or democracy..." autocomplete="off">
-                <button id="send-msg" class="magic-glow">✨ Ask JanMat</button>
+              <div class="input-container">
+                <textarea id="user-input" placeholder="Ask JanMat anything..." rows="1"></textarea>
+                <button id="send-msg" class="send-btn" aria-label="Send Message">
+                  <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="input-footer">
+                <span>Press Enter to send</span>
+                <span class="sep">•</span>
+                <span>Verified ECI Info</span>
               </div>
             </div>
           </div>
