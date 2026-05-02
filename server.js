@@ -16,6 +16,7 @@ const port = process.env.PORT || 8080;
 
 // Configuration: Support Gemini API
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const USE_VERTEX_AI = process.env.USE_VERTEX_AI === 'true' || !!process.env.GOOGLE_CLOUD_PROJECT;
 
 // System instruction constant
 const SYSTEM_INSTRUCTION = `##RULE #1 — LANGUAGE (NON-NEGOTIABLE)##
