@@ -113,7 +113,7 @@ Delhi SIR 2025: ceodelhi.gov.in
 
 // Initialize AI based on configuration
 let generativeModel;
-const MODEL_NAME = 'gemini-1.5-flash'; // Most stable for Google Cloud API Keys with Grounding
+const MODEL_NAME = 'gemini-2.0-flash'; // Current stable model
 
 async function initAI() {
   try {
@@ -121,13 +121,12 @@ async function initAI() {
       console.log(`Using API Key mode for ${USE_VERTEX_AI ? 'Vertex' : 'Gemini'}`);
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
       
-      // Use the most stable model version for Google Cloud API keys
       generativeModel = genAI.getGenerativeModel({
         model: MODEL_NAME,
-        tools: [{ googleSearch: {} }],
         systemInstruction: { role: 'system', parts: [{ text: SYSTEM_INSTRUCTION }] }
       });
       console.log(`✅ AI initialized with model: ${MODEL_NAME}`);
+
     } else {
       console.warn("⚠️ No API Key found. This is fine if you are running on Cloud Run with a Service Account.");
     }
