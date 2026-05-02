@@ -1,57 +1,79 @@
-# 🗳️ JanMat AI (Bharat Election Guide)
-### *Empowering the Indian Electorate through Intelligent Guidance.*
+# JanMat AI (जनमत AI) 🇮🇳
+### Your Premium Guide to Indian Elections
 
-![Project Banner](https://img.shields.io/badge/Challenge-Election_Process_Education-blueviolet?style=for-the-badge)
-![Target](https://img.shields.io/badge/Audience-Indian_Voters-orange?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/Powered_By-Google_Gemini-blue?style=for-the-badge)
+**JanMat AI** is a state-of-the-art, multi-lingual AI assistant designed to democratize election literacy in India. Built for the **PromptWars Challenge (Vertical 2: Election Process Education)**, it simplifies complex voter registration processes, polling booth navigation, and electoral rules into an interactive, human-centric experience.
 
 ---
 
-## 📖 Project Overview
-
-### 📌 Chosen Vertical
-**Challenge 2: Election Process Education.**
-In India, the world's largest democracy, millions of potential voters are deterred by the perceived complexity of the election process. Critical information about **Form 6 (Registration)**, **BLO verification**, and **polling booth discovery** is scattered. We chose this vertical to transform this complex bureaucratic process into an **interactive, easy-to-follow educational experience**.
-
-### 🧠 Approach and Logic
-To secure a top standing and provide genuine value, our logic revolves around a **Context-Role-Constraint** framework powered by Google Gemini:
-- **Role-Based Persona**: The AI acts as a "Senior Civic Consultant" programmed to provide *Layman Breakdowns* and avoid bureaucratic jargon.
-- **Contextual Awareness**: The prompt logic dictates specific pathways for Form 6 vs. Form 8.
-- **Strict Neutrality**: Built-in guardrails strictly prevent political bias or hallucinated officer names.
-- **Formatting Logic**: The AI is instructed to output Markdown, which our frontend parses (`marked.js`) into beautiful HTML with rich visuals, satisfying the "easy-to-follow" requirement.
-
-### ⚙️ How the Solution Works
-We developed **JanMat AI** using a disciplined "brick-by-brick" implementation strategy with Antigravity:
-- **Context-Aware Demographic Toggle**: A brilliant 'Rural vs. Urban' interactive switch that dynamically alters the timeline advice (e.g., Gram Panchayat vs. Ward Office) to account for India's diverse accessibility needs.
-- **Premium UI/UX**: A high-end, glassmorphic design system built with Vanilla CSS ensures the platform feels modern and accessible.
-- **Interactive ECI Timeline**: A visual, step-by-step roadmap of the **Election Commission of India (ECI)** process for interactive exploration.
-- **Backend AI Engine**: A Node.js backend connects securely to **Google Gemini 1.5 Flash** (via Vertex AI). It intercepts user questions, injects our engineered system prompt, and returns structured educational guidance.
-- **Strategic Deployment**: Leveraging **Google Cloud Run** for containerized deployment and **Firebase Studio** for real-time session logging.
-
-### 🏆 Impact & Results
-**JanMat AI** serves as a premium civic education platform that:
-- **Demystifies Registration**: Breaks down complex forms into simple, visual steps.
-- **Enhances Accessibility**: Provides a friendly AI companion (JanMat) who speaks the user's language.
+## 🎯 Chosen Vertical
+**Vertical 2: Election Process Education**
+JanMat AI focuses on transforming the bureaucratic complexity of the Indian electoral system into a conversational journey. It addresses the diverse linguistic landscape of India, ensuring that every citizen—regardless of their primary language or digital literacy—can understand their rights and the voting process.
 
 ---
 
-## 🛠️ Mandatory Tool Usage (PromptWars Requirements)
-This project explicitly leverages the following Google services:
-- **AI Core**: [Google Gemini 1.5 Flash](https://aistudio.google.com/) via Vertex AI.
-- **Compute**: [Google Cloud Run](https://cloud.google.com/run) (Containerized Deployment).
-- **Storage/Auth**: [Firebase Studio](https://firebase.google.com/) (Session management).
-- **Architect**: **Google Antigravity** (Used for code generation and auditing).
+## 🚀 Key Features & Google Services Integration
 
-## 🤔 Any Assumptions Made
-- **User Demographics**: Assumed target users are primarily English-speaking Indian citizens comfortable with mobile or desktop web browsing.
-- **Firebase Configuration**: Assumed that the Firebase Studio environment is pre-configured with the necessary read/write rules for session logging.
-- **API Availability**: Assumed that the Google Gemini API (Vertex AI) remains highly available and responds within acceptable latency limits for real-time interactions.
+### 1. 🧠 Intelligent Conversational Core (Gemini 1.5 Flash)
+- **Context-Aware Responses**: Uses advanced system prompting to maintain a helpful, "Sir/Ma'am" humble persona.
+- **Language Mirroring**: Automatically detects and mirrors the user's language (English, Hindi, Hinglish, Bengali, Tamil, etc.), supporting 22 official Indian languages.
+- **Dynamic Reasoning**: Provides real-time answers about Form 6, EPIC verification, and polling protocols.
 
-## 🗺️ Roadmap
-- [x] **Phase 1**: Indian Localization & Strategic Branding
-- [x] **Phase 2**: ECI Process Timeline & Premium UI
-- [x] **Phase 3**: Vertex AI & Firebase Connection (Enhanced UI & Logging)
-- [/] **Phase 4**: Cloud Run Deployment & Submission (Dockerfile Created)
+### 2. 🔊 Accessible Voice Experience (Web Speech API)
+- **Natural Voice Input**: Reliable one-click voice recording for hands-free queries.
+- **Neural TTS**: High-quality, language-specific Text-to-Speech with Play/Pause/Stop controls, utilizing Google's neural voice engines for natural pronunciation.
+
+### 3. 🗺️ Interactive Voter Journey
+- **Visual Timelines**: A step-by-step interactive guide through registration, verification, and voting.
+- **Location-Sensitive Context**: Switches between Rural and Urban workflows to provide accurate local instructions (e.g., BLO verification vs. Ward Office protocols).
+
+### 4. 📊 Data Persistence (Firebase Studio)
+- **Session Tracking**: Securely logs chat sessions for long-term history and analytics.
+- **Scalable Real-time Storage**: Handles multiple simultaneous conversations without state loss.
+
+### 5. ☁️ Production Deployment (Google Cloud Run)
+- **Scalable Architecture**: Deployed as a containerized service on Cloud Run for high availability and low-latency performance during peak election cycles.
 
 ---
-*Built with ❤️ for PromptWars Virtual | #BuildwithAI #PromptWarsVirtual*
+
+## 🛠️ Technical Architecture
+
+### **The Stack**
+- **Frontend**: Vanilla JavaScript + Vite + CSS3 (Glassmorphism & Magic Glow aesthetics).
+- **Backend**: Node.js + Express (Server-side proxy for API security).
+- **AI Engine**: Google Gemini 1.5 Flash API.
+- **Database**: Firebase Firestore (for session logging).
+- **Styling**: Premium custom CSS with tricolor "JanMat" theme.
+
+### **Approach & Logic**
+1. **Security-First**: API keys are strictly managed via environment variables and a server-side proxy to prevent client-side exposure.
+2. **Inclusive Design**: Prioritized accessibility through ARIA labels, high-contrast themes, and multi-language support.
+3. **Logic Flow**: The system uses a "Decision-Tree to AI" hybrid model. Fixed journey steps provide structure, while the AI assistant handles unstructured, complex queries.
+
+---
+
+## 📝 Tool Usage & Evolution
+- **Why Gemini?**: Selected for its superior reasoning in Indian cultural contexts and its efficiency in handling multi-lingual code-switching (Hinglish/Banglish).
+- **Prompt Evolution**: Started with simple task-based prompts. Evolved into a detailed **System Instruction** model that strictly enforces language mirroring and a specific "Humble Guide" persona.
+- **GenAI vs. Human Design**:
+    - **GenAI**: Handled the complex natural language understanding, reasoning for election queries, and dynamic suggestion generation.
+    - **Human Design**: Crafted the tricolor UI aesthetic, the interactive timeline component, the location-switching logic, and the security architecture.
+
+---
+
+## 📦 Submission Checklist Compliance
+- [x] **Vertical**: Election Process Education (Vertical 2)
+- [x] **Repository**: Public GitHub Repo with a single branch.
+- [x] **Size**: < 10MB (optimized assets, ignored node_modules).
+- [x] **Security**: No hardcoded keys; server-side proxy implemented.
+- [x] **Google Services**: Meaningful integration of Gemini, Cloud Run, and Firebase.
+
+---
+
+## 🚀 Getting Started
+1. Clone the repository.
+2. Run `npm install`.
+3. Set up your `.env` with `GEMINI_API_KEY` and Firebase credentials.
+4. Start the dev server: `npm run dev`.
+
+---
+*Developed for the PromptWars Challenge 2026. Empowering every vote through AI.*

@@ -820,14 +820,14 @@ function updateLocationContext(type) {
   if (type === 'rural') {
     btnRural.classList.add('active');
     btnUrban.classList.remove('active');
-    h1.innerHTML = '<strong>How:</strong> Apply online. For Rural areas, your local BLO will coordinate with the Gram Panchayat for verification.';
-    h2.innerHTML = '<strong>How:</strong> The BLO visits your residence. In Rural areas, you can also consult your Pradhan\'s office for status.';
-    h3.innerHTML = '<strong>How:</strong> Locate your booth and carry a valid ID. In Rural areas, check the local primary school or community hall.';
+    h1.innerHTML = '<strong>How:</strong> Apply online at <a href="https://voters.eci.gov.in/" target="_blank" class="inline-link">voters.eci.gov.in</a>. For Rural areas, your local BLO will coordinate with the Gram Panchayat for verification.';
+    h2.innerHTML = '<strong>How:</strong> The BLO visits your residence. In Rural areas, you can also consult your Pradhan\'s office or check status at <a href="https://voters.eci.gov.in/voter/search" target="_blank" class="inline-link">voters.eci.gov.in/voter/search</a>';
+    h3.innerHTML = '<strong>How:</strong> Locate your booth at <a href="https://electoralsearch.eci.gov.in/" target="_blank" class="inline-link">electoralsearch.eci.gov.in</a> and carry a valid ID. In Rural areas, check the local primary school or community hall.';
   } else {
     btnUrban.classList.add('active');
     btnRural.classList.remove('active');
-    h1.innerHTML = '<strong>How:</strong> Apply online via ECI Portal. In Urban areas, verification is handled by Ward Offices or Municipal Centers.';
-    h2.innerHTML = '<strong>How:</strong> BLO verification at your door. You can visit your local Ward Office for any queries or help.';
-    h3.innerHTML = '<strong>How:</strong> Check your assigned polling station at a nearby Government School or Community Center.';
+    h1.innerHTML = '<strong>How:</strong> Apply online via ECI Portal at <a href="https://voters.eci.gov.in/" target="_blank" class="inline-link">voters.eci.gov.in</a>. In Urban areas, verification is handled by Ward Offices or Municipal Centers.';
+    h2.innerHTML = '<strong>How:</strong> BLO verification at your door. You can visit your local Ward Office or check status at <a href="https://voters.eci.gov.in/voter/search" target="_blank" class="inline-link">voters.eci.gov.in/voter/search</a>';
+    h3.innerHTML = '<strong>How:</strong> Check your assigned polling station at <a href="https://electoralsearch.eci.gov.in/" target="_blank" class="inline-link">electoralsearch.eci.gov.in</a> or visit a nearby Government School or Community Center.';
   }
 }

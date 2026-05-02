@@ -14,9 +14,8 @@ const app = express();
 app.use(express.json());
 const port = process.env.PORT || 8080;
 
-// Configuration: Support both Gemini API and Vertex AI
-const USE_VERTEX_AI = process.env.GOOGLE_CLOUD_PROJECT && process.env.GOOGLE_CLOUD_LOCATION;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+// Configuration: Support Gemini API
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // System instruction constant
 const SYSTEM_INSTRUCTION = `##RULE #1 — LANGUAGE (NON-NEGOTIABLE)##
