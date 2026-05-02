@@ -275,7 +275,7 @@ function showError(message) {
   const errorDiv = document.createElement('div');
   errorDiv.className = 'message ai error-message fade-in';
   errorDiv.innerHTML = `
-    <div class="ai-avatar" style="background:linear-gradient(135deg,#ef4444,#dc2626)">!</div>
+    <div class="ai-avatar" style="background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25);color:rgba(239,68,68,0.8)">!</div>
     <div class="ai-text error-text">
       <p>${userMessage}</p>
       <button class="retry-btn" onclick="window.retryLastMessage()">↻ Try Again</button>
