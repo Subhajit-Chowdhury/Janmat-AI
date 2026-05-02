@@ -52,7 +52,11 @@ JanMat AI focuses on transforming the bureaucratic complexity of the Indian elec
 ---
 
 ## 📝 Tool Usage & Evolution
-- **Why Gemini?**: Selected for its superior reasoning in Indian cultural contexts and its efficiency in handling multi-lingual code-switching (Hinglish/Banglish).
+- **Tools Used & Why Selected**:
+    - **Anti-Gravity**: Used as the primary AI pair-programming agent for rapid prototyping, end-to-end auditing, debugging API quota issues, and structuring the deployment architecture.
+    - **Gemini 1.5 Flash**: Selected for its superior reasoning in Indian cultural contexts, low latency, and its efficiency in handling multi-lingual code-switching (Hinglish/Banglish).
+    - **Firebase Studio**: Chosen for seamless session logging and real-time database capabilities.
+    - **Google Cloud Run**: Selected for scalable, containerized production deployment.
 - **Prompt Evolution**: Started with simple task-based prompts. Evolved into a detailed **System Instruction** model that strictly enforces language mirroring and a specific "Humble Guide" persona.
 - **GenAI vs. Human Design**:
     - **GenAI**: Handled the complex natural language understanding, reasoning for election queries, and dynamic suggestion generation.
