@@ -159,33 +159,10 @@ async function initAI() {
 
 initAI();
 
-// Persistent conversation store via Firestore
-async function getChatHistory(sessionId) {
-  try {
-    const docRef = doc(db, 'conversations', sessionId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data().history || [];
-    }
-  } catch (err) {
-    console.error('Error loading history from Firestore:', err.message);
-  }
-  return [];
-}
-
-async function saveChatHistory(sessionId, history) {
-  try {
-    // Keep only last 10 turns to save tokens and prevent huge docs
-    const trimmedHistory = history.slice(-20); 
-    const docRef = doc(db, 'conversations', sessionId);
-    await setDoc(docRef, { history: trimmedHistory, updatedAt: new Date() }, { merge: true });
-  } catch (err) {
-    console.error('Error saving history to Firestore:', err.message);
-  }
-}
+// In-memory conversation store (sessionId → chat history)
+const sessionStore = new Map();
 
 // Concurrency limiter — max simultaneous Gemini API calls
-// Gemini free tier = 15 RPM; we cap at 8 concurrent to stay safe
 const MAX_CONCURRENT = 8;
 let activeRequests = 0;
 const requestQueue = [];
@@ -210,31 +187,12 @@ function releaseSlot() {
   }
 }
 
-// Retry with exponential backoff for rate-limit errors
-async function callWithRetry(fn, retries = 2, delayMs = 1500) {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return await fn();
-    } catch (err) {
-      const isRateLimit = err?.status === 429 || err?.message?.includes('429') || err?.message?.toLowerCase().includes('quota');
-      if (isRateLimit && attempt < retries) {
-        await new Promise(r => setTimeout(r, delayMs * Math.pow(2, attempt)));
-        continue;
-      }
-      throw err;
-    }
-  }
-}
-
-// Request deduplication map (prompt hash → promise)
-const pendingRequests = new Map();
-
 // AI Chat Endpoint
 app.post('/api/chat', async (req, res) => {
   try {
     if (!generativeModel) {
       return res.status(500).json({
-        error: 'AI service not configured. Please ensure your .env keys are set correctly.'
+        error: 'AI service not configured. Please check your API Key.'
       });
     }
 
@@ -246,32 +204,21 @@ app.post('/api/chat', async (req, res) => {
     const trimmedPrompt = prompt.trim();
     const sessionId = req.headers['x-session-id'] || 'default-session';
 
-    // Deduplication: if same prompt from same session within 2 seconds, return cached
-    const requestKey = `${sessionId}:${trimmedPrompt}`;
-    if (pendingRequests.has(requestKey)) {
-      return pendingRequests.get(requestKey);
-    }
-
     const chatAction = async () => {
-      // Wait for a concurrency slot
       await acquireSlot();
       try {
-        // Load history from Firestore
-        let history = await getChatHistory(sessionId);
+        // Use memory storage
+        let history = sessionStore.get(sessionId) || [];
 
-        // Create chat with history and send with retry backoff
-        const text = await callWithRetry(async () => {
-          const chat = generativeModel.startChat({ history });
-          const result = await chat.sendMessage(trimmedPrompt);
-          return result.response.text();
-        });
+        const chat = generativeModel.startChat({ history });
+        const result = await chat.sendMessage(trimmedPrompt);
+        const text = result.response.text();
 
-        // Update history
+        // Update memory
         history.push({ role: 'user', parts: [{ text: trimmedPrompt }] });
         history.push({ role: 'model', parts: [{ text }] });
-        
-        // Save to Firestore asynchronously
-        saveChatHistory(sessionId, history);
+        if (history.length > 20) history.splice(0, history.length - 20);
+        sessionStore.set(sessionId, history);
 
         return { response: text };
       } finally {
@@ -279,24 +226,17 @@ app.post('/api/chat', async (req, res) => {
       }
     };
 
-    const promise = chatAction()
-      .then(data => res.json(data))
-      .catch(error => {
-        console.error('Generative AI Error:', error);
-        if (!res.headersSent) {
-          res.status(500).json({
-            error: 'AI service temporarily unavailable. ' + (error.message || '')
-          });
-        }
-      });
+    // Execute chat action and return response
+    const data = await chatAction();
+    res.json(data);
 
-    pendingRequests.set(requestKey, promise);
-    setTimeout(() => pendingRequests.delete(requestKey), 2000);
   } catch (error) {
     console.error('Generative AI Error:', error);
-    res.status(500).json({
-      error: 'AI service temporarily unavailable. Please try again. ' + (error.message || '')
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: 'AI service temporarily unavailable. Please try again. ' + (error.message || '')
+      });
+    }
   }
 });
 
