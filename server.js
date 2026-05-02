@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { VertexAI } from '@google-cloud/vertexai';
 
 dotenv.config();
 
@@ -13,21 +14,12 @@ const app = express();
 app.use(express.json());
 const port = process.env.PORT || 8080;
 
-// Initialize Google Generative AI
-const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+// Configuration: Support both Gemini API and Vertex AI
+const USE_VERTEX_AI = process.env.GOOGLE_CLOUD_PROJECT && process.env.GOOGLE_CLOUD_LOCATION;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
-if (!apiKey) {
-  console.warn("⚠️ WARNING: GEMINI_API_KEY (or VITE_GEMINI_API_KEY) is not set in the environment variables!");
-  console.warn("Please add your Gemini API Key to a .env file to enable the AI chat feature.");
-}
-
-const genAI = new GoogleGenerativeAI(apiKey || 'missing-key');
-const generativeModel = genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
-  systemInstruction: {
-    role: 'system',
-    parts: [{
-      text: `IDENTITY: You are JanMat AI — a calm, knowledgeable guide for Indian elections. You explain simply, clearly, and patiently. Use "Sir/Ma'am" naturally. Never show off.
+// System instruction constant
+const SYSTEM_INSTRUCTION = `IDENTITY: You are JanMat AI — a calm, knowledgeable guide for Indian elections. You explain simply, clearly, and patiently. Use "Sir/Ma'am" naturally. Never show off.
 
 TONE: Warm, genuine, humble. Short sentences. Everyday words.
 
@@ -80,11 +72,38 @@ Aadhaar, Voter ID (EPIC), Passport, Driving Licence, PAN Card, MNREGA Job Card, 
 SIR: House-to-house BLO verification. SSR: Annual draft roll → claims/objections → final roll. Qualifying date: Jan 1.
 Delhi SIR 2025: ceodelhi.gov.in
 
---- END KNOWLEDGE BASE ---`
+--- END KNOWLEDGE BASE ---`;
+
+// Initialize AI based on configuration
+let generativeModel;
+
+if (USE_VERTEX_AI) {
+  // Vertex AI (recommended for production)
+  console.log('Using Vertex AI with project:', process.env.GOOGLE_CLOUD_PROJECT);
+  const vertexAI = new VertexAI({
+    project: process.env.GOOGLE_CLOUD_PROJECT,
+    location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
+  });
+  generativeModel = vertexAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    systemInstruction: {
+      role: 'system',
+      parts: [{ text: SYSTEM_INSTRUCTION }]
     }
-  ]
+  });
+} else if (GEMINI_API_KEY) {
+  // Google Gemini API (fallback option)
+  const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+  generativeModel = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash',
+    systemInstruction: {
+      role: 'system',
+      parts: [{ text: SYSTEM_INSTRUCTION }]
+    }
+  });
+} else {
+  console.warn("⚠️ WARNING: Neither Vertex AI nor Gemini API key is configured!");
 }
-});
 
 // In-memory conversation store (sessionId → chat history)
 const sessionStore = new Map();
@@ -106,9 +125,9 @@ const pendingRequests = new Map();
 // AI Chat Endpoint
 app.post('/api/chat', async (req, res) => {
   try {
-    if (!apiKey) {
+    if (!generativeModel) {
       return res.status(500).json({
-        error: 'API Key Error: GEMINI_API_KEY is missing. Please configure .env file.'
+        error: 'AI service not configured. Set GOOGLE_CLOUD_PROJECT + GOOGLE_CLOUD_LOCATION for Vertex AI, or GEMINI_API_KEY for Gemini API.'
       });
     }
 
@@ -172,5 +191,6 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`JanMat AI Server running on port ${port} with Google Gemini`);
+  const mode = USE_VERTEX_AI ? 'Vertex AI' : 'Google Gemini';
+  console.log(`JanMat AI Server running on port ${port} with ${mode}`);
 });
