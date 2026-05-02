@@ -584,16 +584,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (window.marked) {
     const renderer = new window.marked.Renderer();
-    renderer.link = (href, title, text) => {
-      // Ensure href is a string to avoid "href.replace is not a function" errors
-      const hrefStr = String(href || '');
+
+    // marked v5+ passes a single token object; v4 passes (href, title, text)
+    renderer.link = function(hrefOrToken, title, text) {
+      let hrefStr, titleStr, textStr;
+      if (hrefOrToken && typeof hrefOrToken === 'object') {
+        // marked v5+ token object
+        hrefStr  = String(hrefOrToken.href  || '');
+        titleStr = String(hrefOrToken.title || hrefStr);
+        textStr  = hrefOrToken.text || hrefStr;
+      } else {
+        // marked v4 separate args
+        hrefStr  = String(hrefOrToken || '');
+        titleStr = String(title || hrefStr);
+        textStr  = text || hrefStr;
+      }
       const displayUrl = hrefStr.replace(/^https?:\/\//, '').replace(/\/$/, '');
       return `<span class="link-with-copy">
-        <a href="${hrefStr}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${title || hrefStr}">${text} ↗</a>
+        <a href="${hrefStr}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${titleStr}">${textStr} ↗</a>
         <span class="link-url-display">${displayUrl}</span>
         <button class="copy-url-btn" onclick="copyToClipboard('${hrefStr}')" title="Copy link">📋 Copy</button>
       </span>`;
     };
+
     window.marked.use({ renderer });
   }
 
