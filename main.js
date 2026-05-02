@@ -242,13 +242,23 @@ function showError(message) {
   const chatMessages = document.getElementById('chat-messages');
   removeTypingIndicator();
 
+  // Clean up the message for user-friendliness
+  let userMessage = message;
+  if (message.includes('JSON') || message.includes('json') || message.includes('parse')) {
+    userMessage = 'The server took too long to respond. Please try again.';
+  } else if (message.includes('fetch') || message.includes('network') || message.includes('Network')) {
+    userMessage = 'Network issue. Please check your internet connection.';
+  } else if (message.includes('500') || message.includes('unavailable')) {
+    userMessage = 'Our AI server is busy right now. Please try again in a moment.';
+  }
+
   const errorDiv = document.createElement('div');
   errorDiv.className = 'message ai error-message fade-in';
   errorDiv.innerHTML = `
-    <div class="error-content">
-      <span class="error-icon">⚠️</span>
-      <p>${message}</p>
-      <button class="retry-btn" onclick="window.retryLastMessage()">Try Again</button>
+    <div class="ai-avatar" style="background:linear-gradient(135deg,#ef4444,#dc2626)">!</div>
+    <div class="ai-text error-text">
+      <p>${userMessage}</p>
+      <button class="retry-btn" onclick="window.retryLastMessage()">↻ Try Again</button>
     </div>
   `;
   chatMessages.appendChild(errorDiv);
@@ -447,13 +457,57 @@ window.handleFeedback = (query, type) => {
   alert("Namaste! Thank you for your feedback, Sir/Ma'am.");
 };
 
+// Copy to clipboard utility
+window.copyToClipboard = function(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    // Show brief feedback
+    const btn = event.target.closest('.copy-url-btn');
+    if (btn) {
+      const original = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+    }
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+};
+
+// Dynamic greeting based on time of day
+function getDynamicGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 5) return { title: 'Up late? Let\'s help you learn 🌙', sub: 'Your trusted AI guide for Indian elections' };
+  if (hour < 12) return { title: 'Good Morning! How can I help? ☀️', sub: 'Start your day by learning about your voting rights' };
+  if (hour < 17) return { title: 'Good Afternoon! What can I help with?', sub: 'Get instant answers about Indian elections — in any language' };
+  if (hour < 21) return { title: 'Good Evening! Ask me anything 🌅', sub: 'Your AI-powered election assistant is ready' };
+  return { title: 'Good Night! Still curious? 🌙', sub: 'Ask about voter registration, polling booths & more' };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log('JanMat AI Initialized');
+
+  // Set dynamic greeting
+  const greeting = getDynamicGreeting();
+  const greetEl = document.getElementById('dynamic-greeting');
+  const subEl = document.getElementById('dynamic-subtitle');
+  if (greetEl) greetEl.textContent = greeting.title;
+  if (subEl) subEl.textContent = greeting.sub;
 
   if (window.marked) {
     const renderer = new window.marked.Renderer();
     renderer.link = (href, title, text) => {
-      return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${title || href}">${text} ↗</a>`;
+      const displayUrl = href.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      return `<span class="link-with-copy">
+        <a href="${href}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${title || href}">${text} ↗</a>
+        <span class="link-url-display">${displayUrl}</span>
+        <button class="copy-url-btn" onclick="copyToClipboard('${href}')" title="Copy link">📋 Copy</button>
+      </span>`;
     };
     window.marked.use({ renderer });
   }
@@ -481,19 +535,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Initial placeholder logic
+    // Rotating placeholders
     const placeholders = [
       "Ask about Voter Registration...",
-      "What is Form 6?",
+      "voter card kaise milega?",
       "How to find my polling booth?",
-      "Can I vote if I'm 17 but turning 18?",
+      "ami ki vote dite pari?",
       "What documents do I need for Voter ID?",
+      "Form 6 kya hota hai?",
     ];
     let pIndex = 0;
     setInterval(() => {
       pIndex = (pIndex + 1) % placeholders.length;
       input.setAttribute('placeholder', placeholders[pIndex]);
-    }, 5000);
+    }, 4000);
   }
 
   // Location Toggle
