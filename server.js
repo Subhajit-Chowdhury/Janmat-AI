@@ -3,8 +3,34 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 dotenv.config();
+
+const { 
+  GEMINI_API_KEY, 
+  USE_VERTEX_AI, 
+  VITE_FIREBASE_API_KEY,
+  VITE_FIREBASE_AUTH_DOMAIN,
+  VITE_FIREBASE_PROJECT_ID,
+  VITE_FIREBASE_STORAGE_BUCKET,
+  VITE_FIREBASE_MESSAGING_SENDER_ID,
+  VITE_FIREBASE_APP_ID
+} = process.env;
+
+// Firebase initialization
+const firebaseConfig = {
+  apiKey: VITE_FIREBASE_API_KEY,
+  authDomain: VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: VITE_FIREBASE_PROJECT_ID,
+  storageBucket: VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: VITE_FIREBASE_APP_ID
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,10 +38,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 8080;
-
-// Configuration: Support Gemini API
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const USE_VERTEX_AI = process.env.USE_VERTEX_AI === 'true';
 
 // System instruction constant
 const SYSTEM_INSTRUCTION = `##RULE #1 — LANGUAGE (NON-NEGOTIABLE)##
@@ -137,23 +159,29 @@ async function initAI() {
 
 initAI();
 
-// In-memory conversation store (sessionId → chat history)
-const sessionStore = new Map();
-const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
-
-// Helper: Extract session ID from headers
-function getSessionId(req) {
-  return req.headers['x-session-id'] || 'default-session';
+// Persistent conversation store via Firestore
+async function getChatHistory(sessionId) {
+  try {
+    const docRef = doc(db, 'conversations', sessionId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data().history || [];
+    }
+  } catch (err) {
+    console.error('Error loading history from Firestore:', err.message);
+  }
+  return [];
 }
 
-// Helper: Initialize or cleanup old sessions
-function cleanupSession(sessionId) {
-  // Clear other sessions if memory gets too high (basic cleanup)
-  if (sessionStore.size > 1000) {
-    const firstKey = sessionStore.keys().next().value;
-    sessionStore.delete(firstKey);
+async function saveChatHistory(sessionId, history) {
+  try {
+    // Keep only last 10 turns to save tokens and prevent huge docs
+    const trimmedHistory = history.slice(-20); 
+    const docRef = doc(db, 'conversations', sessionId);
+    await setDoc(docRef, { history: trimmedHistory, updatedAt: new Date() }, { merge: true });
+  } catch (err) {
+    console.error('Error saving history to Firestore:', err.message);
   }
-  sessionStore.set(sessionId, []);
 }
 
 // Concurrency limiter — max simultaneous Gemini API calls
@@ -206,7 +234,7 @@ app.post('/api/chat', async (req, res) => {
   try {
     if (!generativeModel) {
       return res.status(500).json({
-        error: 'AI service not configured. Set GOOGLE_CLOUD_PROJECT + GOOGLE_CLOUD_LOCATION for Vertex AI, or GEMINI_API_KEY for Gemini API.'
+        error: 'AI service not configured. Please ensure your .env keys are set correctly.'
       });
     }
 
@@ -216,7 +244,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const trimmedPrompt = prompt.trim();
-    const sessionId = getSessionId(req);
+    const sessionId = req.headers['x-session-id'] || 'default-session';
 
     // Deduplication: if same prompt from same session within 2 seconds, return cached
     const requestKey = `${sessionId}:${trimmedPrompt}`;
@@ -225,14 +253,11 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const chatAction = async () => {
-      // Wait for a concurrency slot (queues if >MAX_CONCURRENT active)
+      // Wait for a concurrency slot
       await acquireSlot();
       try {
-        // Get or create chat history for this session
-        let history = sessionStore.get(sessionId) || [];
-        if (!sessionStore.has(sessionId)) {
-          cleanupSession(sessionId);
-        }
+        // Load history from Firestore
+        let history = await getChatHistory(sessionId);
 
         // Create chat with history and send with retry backoff
         const text = await callWithRetry(async () => {
@@ -244,8 +269,9 @@ app.post('/api/chat', async (req, res) => {
         // Update history
         history.push({ role: 'user', parts: [{ text: trimmedPrompt }] });
         history.push({ role: 'model', parts: [{ text }] });
-        if (history.length > 20) history.splice(0, history.length - 20);
-        sessionStore.set(sessionId, history);
+        
+        // Save to Firestore asynchronously
+        saveChatHistory(sessionId, history);
 
         return { response: text };
       } finally {
