@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JanMat AI | Bharat Election Guide</title>
     <link rel="icon" type="image/png" href="janmat_favicon_1777406527353.png">
-    <meta name="description" content="Professional AI assistant for the Indian Election Process. Powered by Vertex AI.">
-    <!-- Google Fonts: Inter & Outfit -->
+    <meta name="description" content="AI assistant for Indian elections. Get instant answers about voting, voter registration, and democratic processes.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
@@ -55,30 +54,53 @@
           JanMat<span>AI</span>
         </a>
         <nav>
-          <a href="#process" onclick="scrollToSection('process')">Voter Journey</a>
-          <a href="#ai-chat" onclick="scrollToSection('ai-chat')">Ask JanMat AI</a>
-          <a href="#about" onclick="scrollToSection('about')">FAQs & Official Links</a>
+          <a href="#chat">Chat</a>
+          <a href="#process">Voter Journey</a>
+          <a href="#faqs">FAQs</a>
         </nav>
       </header>
 
-      <!-- Home / Hero Section -->
+      <!-- Hero Section - AI Chat Focus -->
       <main id="home" class="hero-section">
         <div class="hero-content">
-          <div class="mission-tag magic-glow">🗳️ Election Process Education · Bharat</div>
-          <h1 class="gradient-text">Interactive Election Guide</h1>
-          <p class="subtitle">JanMat AI is your educational assistant designed to help you understand the Indian election process, timelines, and steps in an interactive and easy-to-follow way.</p>
-          <div class="cta-group">
-            <button class="btn-primary magic-glow" onclick="scrollToSection('ai-chat')">Ask the AI Assistant</button>
-            <button class="btn-secondary" onclick="scrollToSection('process')">Explore the Timelines</button>
+          <div class="hero-badge magic-glow">🇮🇳 Your AI Election Assistant</div>
+          <h1 class="gradient-text">Ask JanMat AI</h1>
+          <p class="subtitle">Get instant, accurate answers about Indian elections. Powered by Google Gemini for reliable information from official ECI sources.</p>
+          
+          <!-- Primary Chat Interface -->
+          <div class="primary-chat magic-glow pulse-glow" id="chat">
+            <div class="chat-messages" id="chat-messages">
+              <div class="message ai">
+                <div class="ai-avatar">₹</div>
+                <div class="ai-text">
+                  Namaste, Sir/Ma'am! 🙏<br><br>Main hoon aapka JanMat AI — aapka intelligent election guide.<br><br><strong>Aap poochh sakte hain:</strong><br>
+                  • "How do I register to vote for the first time?"<br>
+                  • "What's the difference between Lok Sabha and Vidhan Sabha?"<br>
+                  • "How is the Prime Minister elected?"<br><br>
+                  Kya aapko kuch poochhna hai aaj?
+                </div>
+              </div>
+              <div class="suggestion-chips">
+                <button class="chip primary-chip" onclick="askChip('How do I register to vote for the first time using Form 6?')">📋 First Time Voter?</button>
+                <button class="chip primary-chip" onclick="askChip('What is the difference between Lok Sabha and Vidhan Sabha?')">🏛️ Lok Sabha vs Vidhan Sabha</button>
+                <button class="chip primary-chip" onclick="askChip('How is the Prime Minister of India elected after elections?')">👑 How PM is Elected</button>
+                <button class="chip primary-chip" onclick="askChip('What is Form 8 and when should I use it?')">📝 Form 8 Explained</button>
+              </div>
+            </div>
+            <div class="ai-input-wrapper">
+              <div class="chat-input-group">
+                <input type="text" id="user-input" placeholder="Type your question about voting, elections, or democracy..." autocomplete="off">
+                <button id="send-msg" class="magic-glow">✨ Ask</button>
+              </div>
+            </div>
           </div>
         </div>
       </main>
 
-      <!-- The Process Section -->
+      <!-- Voter Journey Timeline -->
       <section id="process" class="process-section glass-container">
-        <h2 class="section-title">The Voter Journey</h2>
+        <h2 class="section-title">Your Voter Journey</h2>
         
-        <!-- Location Selector Toggle -->
         <div class="location-toggle-container">
           <span class="toggle-label">Applying from:</span>
           <div class="toggle-switch">
@@ -88,84 +110,80 @@
         </div>
 
         <div class="timeline" id="election-timeline">
-          <!-- Step 1 -->
           <div class="timeline-item active magic-glow" data-step="1">
             <div class="step-num">1</div>
             <div class="step-content">
-              <h3>Voter Registration (Form 6)</h3>
-              <p><strong>What:</strong> Formal application to join the Indian Electoral Roll.</p>
-              <p><strong>Why:</strong> To exercise your constitutional right and receive your official EPIC (Voter ID) card.</p>
-              <p id="step-1-how"><strong>How:</strong> Apply online. For Rural areas, your local BLO will coordinate with the Gram Panchayat for verification.</p>
-              <div class="details">Visit Official ECI Portal: <a href="https://voters.eci.gov.in/" target="_blank">https://voters.eci.gov.in/</a></div>
+              <h3>Voter Registration</h3>
+              <p id="step-1-how"><strong>How:</strong> Apply online. For Rural areas, your local BLO coordinates with Gram Panchayat.</p>
+              <div class="details"><a href="https://voters.eci.gov.in/" target="_blank">voters.eci.gov.in</a></div>
             </div>
           </div>
-          <!-- Step 2 -->
           <div class="timeline-item magic-glow" data-step="2">
             <div class="step-num">2</div>
             <div class="step-content">
-              <h3>Verification & Roll Check</h3>
-              <p><strong>What:</strong> Identity authentication by a Booth Level Officer (BLO).</p>
-              <p><strong>Why:</strong> To ensure the integrity of the database and confirm your polling station assignment.</p>
-              <p id="step-2-how"><strong>How:</strong> The BLO visits your residence. In Rural areas, you can also consult your Pradhan's office for status.</p>
-              <div class="details">Official ECI Search Portal: <a href="https://voters.eci.gov.in/voter/search" target="_blank">https://voters.eci.gov.in/voter/search</a></div>
+              <h3>Verification</h3>
+              <p id="step-2-how"><strong>How:</strong> BLO visits for verification. Check Pradhan's office in rural areas.</p>
+              <div class="details"><a href="https://voters.eci.gov.in/voter/search" target="_blank">Check Status</a></div>
             </div>
           </div>
-          <!-- Step 3 -->
           <div class="timeline-item magic-glow" data-step="3">
             <div class="step-num">3</div>
             <div class="step-content">
-              <h3>Casting Your Vote</h3>
-              <p><strong>What:</strong> Participating in the General or Assembly Elections.</p>
-              <p><strong>Why:</strong> To shape the future of Bharat through your democratic power.</p>
-              <p><strong>How:</strong> Locate your booth and carry a valid ID. In Rural areas, check the local primary school or community hall.</p>
-              <div class="details">Polling Station Finder: <a href="https://voters.eci.gov.in/voter/polling-station" target="_blank">https://voters.eci.gov.in/voter/polling-station</a></div>
+              <h3>Cast Your Vote</h3>
+              <p><strong>How:</strong> Locate booth with valid ID. Check local school/community hall in rural areas.</p>
+              <div class="details"><a href="https://voters.eci.gov.in/voter/polling-station" target="_blank">Find Booth</a></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- AI Chat Section -->
-      <section id="ai-chat" class="chat-section glass-container">
-        <h2 class="section-title">Ask JanMat AI</h2>
-        <div class="chat-box magic-glow">
-          <div class="chat-messages" id="chat-messages">
-            <div class="message ai">Namaste! 🙏 I'm JanMat AI.<br><br>Voting is one of the most powerful things you can do as a citizen of Bharat — and I'm here to make sure you understand every step of it, simply and clearly.<br><br>You can ask me things like:<br>👉 <em>"How do I get my first Voter ID?"</em><br>👉 <em>"What happens on election day?"</em><br>👉 <em>"What's the difference between Lok Sabha and Vidhan Sabha?"</em><br><br>What would you like to know?</div>
-            <div class="suggestion-chips">
-              <button class="chip" onclick="askChip('What is Lok Sabha (Lower House) and how does it work?')">🏛️ Lok Sabha <span>Lower House</span></button>
-              <button class="chip" onclick="askChip('What is Rajya Sabha (Upper House) and how does it work?')">⚖️ Rajya Sabha <span>Upper House</span></button>
-              <button class="chip" onclick="askChip('What is Vidhan Sabha and how is a Chief Minister elected?')">🗺️ Vidhan Sabha <span>State Level</span></button>
-            </div>
-          </div>
-          <div class="ai-input-wrapper">
-            <div class="chat-input-group">
-              <input type="text" id="user-input" placeholder="e.g., How do I register in West Bengal?">
-              <button id="send-msg">✨ Send</button>
-            </div>
-          </div>
+      <!-- Essential Tools -->
+      <section id="tools" class="tools-section glass-container">
+        <h2 class="section-title">Essential Tools</h2>
+        <div class="tools-grid">
+          <a href="https://voters.eci.gov.in/" target="_blank" class="tool-card magic-glow">
+            <div class="tool-icon">🌐</div>
+            <h3>ECI Portal</h3>
+            <p>Official voter registration & services</p>
+          </a>
+          <a href="https://eci.gov.in/" target="_blank" class="tool-card magic-glow">
+            <div class="tool-icon">📊</div>
+            <h3>Election Commission</h3>
+            <p>National election information</p>
+          </a>
+          <a href="https://ceodelhi.gov.in/" target="_blank" class="tool-card magic-glow">
+            <div class="tool-icon">🏛️</div>
+            <h3>CEO Delhi</h3>
+            <p>Delhi-specific election services</p>
+          </a>
+          <a href="https://voters.eci.gov.in/voter/search" target="_blank" class="tool-card magic-glow">
+            <div class="tool-icon">🔍</div>
+            <h3>Check Voter List</h3>
+            <p>Verify your registration status</p>
+          </a>
         </div>
       </section>
 
-      <!-- About & FAQ Section -->
-      <section id="about" class="faq-section">
+      <!-- FAQs -->
+      <section id="faqs" class="faq-section">
         <div class="glass-container">
-          <h2 class="section-title">FAQs & Official Links</h2>
-          <p class="subtitle" style="text-align: center; margin-bottom: 3rem;">JanMat AI is a premium initiative to empower Indian citizens with accurate, neutral information. Built on the cutting edge of Google's Vertex AI.</p>
+          <h2 class="section-title">Quick FAQs</h2>
           <div class="faq-grid">
             <div class="faq-card magic-glow">
-              <h3>🗳️ What is Form 6?</h3>
-              <p>Form 6 is for NEW voter registration. If you are 18+ and not registered, this is your starting point.</p>
+              <h3>📋 Form 6</h3>
+              <p>New voter registration. Required if you're 18+ and not registered.</p>
             </div>
             <div class="faq-card magic-glow">
-              <h3>📝 What is Form 8?</h3>
-              <p>Form 8 is for corrections (Name, Address, Photo) or shifting your constituency.</p>
+              <h3>📝 Form 8</h3>
+              <p>Correct name, address, or transfer constituency.</p>
             </div>
             <div class="faq-card magic-glow">
-              <h3>📍 Finding your Booth?</h3>
-              <p>Use your EPIC number on the 'voters.eci.gov.in' portal to find your exact polling station.</p>
+              <h3>📍 Find Booth</h3>
+              <p>Use EPIC number at voters.eci.gov.in to find polling station.</p>
             </div>
             <div class="faq-card magic-glow">
-              <h3>🆔 Digital Voter ID?</h3>
-              <p>New voters can download their e-EPIC (digital Voter ID) directly from the NVSP portal.</p>
+              <h3>🆔 e-EPIC</h3>
+              <p>Digital Voter ID downloadable from NVSP portal.</p>
             </div>
           </div>
         </div>
@@ -173,55 +191,46 @@
 
       <footer class="footer">
         <div class="footer-content">
-          <p>© 2026 JanMat AI - Empowering Bharat's Democracy</p>
+          <p>© 2026 JanMat AI - Built with Google Gemini for Bharat's Democracy</p>
           <div class="footer-links">
-            <a href="https://voters.eci.gov.in/" target="_blank">Official ECI Portal</a>
-            <a href="https://www.nvsp.in/" target="_blank">NVSP Services</a>
+            <a href="https://voters.eci.gov.in/" target="_blank">ECI Portal</a>
+            <a href="https://eci.gov.in/" target="_blank">Election Commission</a>
           </div>
         </div>
       </footer>
     </div>
-     <!-- Markdown Parser -->
-     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-     <script type="module" src="/main.js"></script>
-     <script>
-       // Generate stable session ID for conversation continuity
-       if (!localStorage.getItem('janmat_session_id')) {
-         const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-         localStorage.setItem('janmat_session_id', id);
-       }
-       const SESSION_ID = localStorage.getItem('janmat_session_id');
 
-       // Override askJanMat to include session header
-       const originalAskJanMat = window.askJanMat || async function(prompt) {
-         const response = await fetch('/api/chat', {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'X-Session-Id': SESSION_ID
-           },
-           body: JSON.stringify({ prompt }),
-         });
-         const data = await response.json();
-         if (!response.ok) throw new Error(data.error || 'Network error');
-         return data.response;
-       };
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module" src="/main.js"></script>
+    <script>
+      if (!localStorage.getItem('janmat_session_id')) {
+        localStorage.setItem('janmat_session_id', 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+      }
+      const SESSION_ID = localStorage.getItem('janmat_session_id');
 
-       window.askJanMat = originalAskJanMat;
+      window.askJanMat = async function(prompt) {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Session-Id': SESSION_ID },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Network error');
+        return data.response;
+      };
 
-       // Keyboard detection for mobile
-       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-         document.addEventListener('focusin', (e) => {
-           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-             document.body.classList.add('keyboard-open');
-           }
-         });
-         document.addEventListener('focusout', (e) => {
-           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-             document.body.classList.remove('keyboard-open');
-           }
-         });
-       }
-     </script>
-   </body>
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        document.addEventListener('focusin', (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            document.body.classList.add('keyboard-open');
+          }
+        });
+        document.addEventListener('focusout', (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            document.body.classList.remove('keyboard-open');
+          }
+        });
+      }
+    </script>
+  </body>
 </html>

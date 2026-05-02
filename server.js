@@ -172,5 +172,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`JanMat AI Server running on port ${port} with Google Generative AI`);
+  console.log(`JanMat AI Server running on port ${port} with Google Gemini`);
 });
