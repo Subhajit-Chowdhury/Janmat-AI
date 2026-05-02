@@ -162,7 +162,7 @@
       }
       const SESSION_ID = localStorage.getItem('electai_session_id');
 
-      window.askJanMat = async function(prompt) {
+      window.askElectAI = async function(prompt) {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Session-Id': SESSION_ID },

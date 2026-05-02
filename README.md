@@ -1,13 +1,13 @@
-# JanMat AI (जनमत AI) 🇮🇳
+# Elect AI 🇮🇳
 ### Your Premium Guide to Indian Elections
 
-**JanMat AI** is a state-of-the-art, multi-lingual AI assistant designed to democratize election literacy in India. Built for the **PromptWars Challenge (Vertical 2: Election Process Education)**, it simplifies complex voter registration processes, polling booth navigation, and electoral rules into an interactive, human-centric experience.
+**Elect AI** is a state-of-the-art, multi-lingual AI assistant designed to democratize election literacy in India. Built for the **PromptWars Challenge (Vertical 2: Election Process Education)**, it simplifies complex voter registration processes, polling booth navigation, and electoral rules into an interactive, human-centric experience.
 
 ---
 
 ## 🎯 Chosen Vertical
 **Vertical 2: Election Process Education**
-JanMat AI focuses on transforming the bureaucratic complexity of the Indian electoral system into a conversational journey. It addresses the diverse linguistic landscape of India, ensuring that every citizen—regardless of their primary language or digital literacy—can understand their rights and the voting process.
+Elect AI focuses on transforming the bureaucratic complexity of the Indian electoral system into a conversational journey. It addresses the diverse linguistic landscape of India, ensuring that every citizen—regardless of their primary language or digital literacy—can understand their rights and the voting process.
 
 ---
 
@@ -42,7 +42,7 @@ JanMat AI focuses on transforming the bureaucratic complexity of the Indian elec
 - **Backend**: Node.js + Express (Server-side proxy for API security).
 - **AI Engine**: Google Gemini 1.5 Flash API.
 - **Database**: Firebase Firestore (for session logging).
-- **Styling**: Premium custom CSS with tricolor "JanMat" theme.
+- **Styling**: Premium custom CSS with tricolor "Elect AI" theme.
 
 ### **Approach & Logic**
 1. **Security-First**: API keys are strictly managed via environment variables and a server-side proxy to prevent client-side exposure.

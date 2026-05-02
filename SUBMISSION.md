@@ -1,10 +1,10 @@
-# 🗳️ JanMat AI - Ultimate Submission Package
+# 🗳️ Elect AI - Ultimate Submission Package
 
 ## 🏁 1. Tool Usage Enforcement (Explicit Documentation)
 This project strictly follows the "Google Services Only" mandate for PromptWars Virtual.
 
 ### Which tools were used & Why they were selected:
-| Mandatory Tool | Why it was selected for JanMat AI |
+| Mandatory Tool | Why it was selected for Elect AI |
 | :--- | :--- |
 | **Google Antigravity** | Selected as the Lead Architect for code generation, auditing, and "brick-by-brick" building to ensure 100% rule compliance and high-speed iteration. |
 | **Google Cloud Run** | Chosen to provide a scalable, Industry-Standard production hosting environment via Docker containers. |
@@ -19,7 +19,7 @@ We followed an iterative evolution strategy to achieve "Top 1" accuracy:
 - **v4 (Ultimate)**: Implemented **Speech-to-Text (STT)**, **Smart Language Auto-Detection** (zero manual selection), and a **Minimalist ChatGPT-inspired UI** to prioritize the AI as the core USP.
 
 ### What GenAI handled vs What humans designed:
-- **Human-Designed**: Strategic branding (JanMat), the "National Saffron/Green" color palette, the 3-step Journey logic, the Rural/Urban accessibility toggle, and the core Prompt Engineering rules.
+- **Human-Designed**: Strategic branding (ElectAI), the "National Saffron/Green" color palette, the 3-step Journey logic, the Rural/Urban accessibility toggle, and the core Prompt Engineering rules.
 - **GenAI-Handled**: Dynamic content generation logic, CSS transition refinements, Web Speech API integration, and writing the boilerplate Node.js/Express server structure.
 
 ---
@@ -35,9 +35,9 @@ We ensured genuine adoption and learning through the following mechanisms:
 5. **Frontend Parsing**: The UI receives the markdown and uses `marked.js` to render it into a beautifully formatted, easy-to-read chat bubble.
 
 ### Tool Usage Explanation in LinkedIn Post
-> **Transforming Civic Education with JanMat AI & Google Cloud**
+> **Transforming Civic Education with Elect AI & Google Cloud**
 > 
-> Proud to submit **JanMat AI** for the #PromptWars Virtual Challenge! 🗳️
+> Proud to submit **Elect AI** for the #PromptWars Virtual Challenge! 🗳️
 >
 > We built a premium, minimalistic guide for the Indian Election Process featuring:
 > 🎤 **Speech-to-Text** for hands-free voter guidance.

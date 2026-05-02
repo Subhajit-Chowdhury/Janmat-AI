@@ -1,10 +1,10 @@
 /**
- * Calls the JanMat AI Server (Generative AI Backend)
+ * Calls the Elect AI Server (Generative AI Backend)
  * @param {string} prompt - User's query
  * @param {string} [sessionId] - Optional session ID for conversation continuity
  * @returns {Promise<string>} - AI response
  */
-export async function askJanMat(prompt, sessionId = null) {
+export async function askElectAI(prompt, sessionId = null) {
   try {
     const headers = {
       'Content-Type': 'application/json',

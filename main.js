@@ -1,5 +1,5 @@
 import './style.css';
-import { askJanMat } from './src/api/gemini.js';
+import { askElectAI } from './src/api/gemini.js';
 import { logChatSession } from './src/api/firebase.js';
 
 // ── Contextual Follow-Up Chips Map ──
@@ -477,7 +477,7 @@ async function sendMessage(manualText = null) {
 
   try {
     // Send raw prompt - AI will auto-detect language and respond in same language
-    const aiRaw = await askJanMat(text, currentSessionId);
+    const aiRaw = await askElectAI(text, currentSessionId);
     removeSkeletonLoader();
 
     const { thinking, answer, references, isValid } = parseAIResponse(aiRaw);
