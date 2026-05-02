@@ -181,8 +181,47 @@
         </div>
       </footer>
     </div>
-    <!-- Markdown Parser -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module" src="/main.js"></script>
-  </body>
+     <!-- Markdown Parser -->
+     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+     <script type="module" src="/main.js"></script>
+     <script>
+       // Generate stable session ID for conversation continuity
+       if (!localStorage.getItem('janmat_session_id')) {
+         const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+         localStorage.setItem('janmat_session_id', id);
+       }
+       const SESSION_ID = localStorage.getItem('janmat_session_id');
+
+       // Override askJanMat to include session header
+       const originalAskJanMat = window.askJanMat || async function(prompt) {
+         const response = await fetch('/api/chat', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'X-Session-Id': SESSION_ID
+           },
+           body: JSON.stringify({ prompt }),
+         });
+         const data = await response.json();
+         if (!response.ok) throw new Error(data.error || 'Network error');
+         return data.response;
+       };
+
+       window.askJanMat = originalAskJanMat;
+
+       // Keyboard detection for mobile
+       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+         document.addEventListener('focusin', (e) => {
+           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+             document.body.classList.add('keyboard-open');
+           }
+         });
+         document.addEventListener('focusout', (e) => {
+           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+             document.body.classList.remove('keyboard-open');
+           }
+         });
+       }
+     </script>
+   </body>
 </html>

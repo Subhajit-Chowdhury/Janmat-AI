@@ -82,7 +82,8 @@ Delhi SIR 2025: ceodelhi.gov.in
 
 --- END KNOWLEDGE BASE ---`
     }
-  }
+  ]
+}
 });
 
 // In-memory conversation store (sessionId → chat history)
@@ -149,7 +150,7 @@ app.post('/api/chat', async (req, res) => {
       sessionStore.set(sessionId, history);
 
       return res.json({ response: text });
-    })());
+    })();
 
     pendingRequests.set(requestKey, promise);
     setTimeout(() => pendingRequests.delete(requestKey), 2000);

@@ -2,12 +2,7 @@ import './style.css';
 import { askJanMat } from './src/api/gemini.js';
 import { logChatSession } from './src/api/firebase.js';
 
-// ─────────────────────────────────────────────────────────────
-// INTENT → FOLLOW-UP CHIPS MAP
-// Pre-built library of 100+ question combinations.
-// Keywords are matched against user's query to surface
-// the most contextually relevant next questions.
-// ─────────────────────────────────────────────────────────────
+// ── Contextual Follow-Up Chips Map ──
 const FOLLOW_UP_MAP = [
   {
     keywords: ['lok sabha', 'lower house', 'parliament', 'member of parliament', 'general election', 'who becomes pm', 'central government'],
@@ -32,8 +27,8 @@ const FOLLOW_UP_MAP = [
     chips: [
       { icon: '👑', label: 'Who becomes CM?', sub: 'State election result', q: 'How does a Chief Minister get elected after Vidhan Sabha results?' },
       { icon: '🗳️', label: 'How to vote for MLA?', sub: 'Your state vote', q: 'How do I cast my vote for MLA in Vidhan Sabha elections?' },
-      { icon: '🏙️', label: 'Panchayat elections', sub: 'Village / Local level', q: 'How do Panchayat elections work and who conducts them?' },
-      { icon: '🏛️', label: 'PM vs CM — difference?', sub: 'Central vs State', q: 'What is the difference between Prime Minister and Chief Minister?' },
+      { icon: '🏠', label: 'Panchayat elections', sub: 'Village / Local level', q: 'How do Panchayat elections work and who conducts them?' },
+      { icon: '🏛️', label: 'PM vs CM — difference?', sub: 'Central vs State', q: 'What is the difference between Prime Minister and Chief Minister in India?' },
     ]
   },
   {
@@ -42,7 +37,7 @@ const FOLLOW_UP_MAP = [
       { icon: '📋', label: 'Documents I need', sub: 'For Form 6', q: 'What documents do I need to apply for a Voter ID card?' },
       { icon: '💻', label: 'Apply online — steps', sub: 'voters.eci.gov.in', q: 'How do I apply for a Voter ID online step by step?' },
       { icon: '🏠', label: 'BLO home visit', sub: 'What happens next?', q: 'After submitting Form 6, will a BLO visit my home? What should I expect?' },
-      { icon: '📲', label: 'Download e-EPIC', sub: 'Digital voter card', q: 'How do I download my e-EPIC digital voter card after registration?' },
+      { icon: '📲', label: 'Download e-EPIC', sub: 'Digital voter card', q: 'How do I download my e-EPIC digital Voter ID after registration?' },
     ]
   },
   {
@@ -50,7 +45,7 @@ const FOLLOW_UP_MAP = [
     chips: [
       { icon: '🌐', label: 'Apply on portal', sub: 'voters.eci.gov.in', q: 'How do I fill and submit Form 6 on the voters.eci.gov.in portal?' },
       { icon: '📄', label: 'Offline Form 6', sub: 'No internet? No problem', q: 'How do I apply for Form 6 offline without internet?' },
-      { icon: '🪪', label: 'Documents needed', sub: 'Age + Address proof', q: 'What are the documents needed for Form 6 voter registration?' },
+      { icon: '🪪', label: 'Documents needed', sub: 'Age + Address Proof', q: 'What are the documents needed for Form 6 voter registration?' },
       { icon: '⏳', label: 'How long does it take?', sub: 'Processing time', q: 'How long does voter registration (Form 6) take to process?' },
     ]
   },
@@ -156,9 +151,6 @@ const FOLLOW_UP_MAP = [
   },
 ];
 
-// ─────────────────────────────────────────────────────────────
-// Matches user query against FOLLOW_UP_MAP and returns chips
-// ─────────────────────────────────────────────────────────────
 function getFollowUpChips(query) {
   const q = query.toLowerCase();
   let bestMatch = null;
@@ -167,7 +159,7 @@ function getFollowUpChips(query) {
   for (const entry of FOLLOW_UP_MAP) {
     let score = 0;
     for (const kw of entry.keywords) {
-      if (q.includes(kw)) score += kw.split(' ').length; // longer matches score higher
+      if (q.includes(kw)) score += kw.split(' ').length;
     }
     if (score > bestScore) {
       bestScore = score;
@@ -178,13 +170,235 @@ function getFollowUpChips(query) {
   return bestScore > 0 ? bestMatch.chips : null;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Initialize the App
-// ─────────────────────────────────────────────────────────────
+// Parse AI response with validation
+function parseAIResponse(raw) {
+  if (!raw || typeof raw !== 'string') {
+    return {
+      thinking: null,
+      answer: "I encountered an issue processing the response. Please try again.",
+      references: null,
+      isValid: false
+    };
+  }
+
+  const thinkingMatch = raw.match(/\[THINKING\]([\s\S]*?)\[\/THINKING\]/);
+  const answerMatch = raw.match(/\[ANSWER\]([\s\S]*?)\[\/ANSWER\]/);
+  const referencesMatch = raw.match(/\[REFERENCES\]([\s\S]*?)\[\/REFERENCES\]/);
+
+  // If format is broken, treat entire response as answer
+  if (!answerMatch && !thinkingMatch && !referencesMatch) {
+    return {
+      thinking: null,
+      answer: raw,
+      references: null,
+      isValid: false
+    };
+  }
+
+  return {
+    thinking: thinkingMatch ? thinkingMatch[1].trim() : null,
+    answer: answerMatch ? answerMatch[1].trim() : raw,
+    references: referencesMatch ? referencesMatch[1].trim() : null,
+    isValid: true
+  };
+}
+
+// Generate stable session ID
+function getSessionId() {
+  let sessionId = localStorage.getItem('janmat_session_id');
+  if (!sessionId) {
+    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('janmat_session_id', sessionId);
+  }
+  return sessionId;
+}
+
+let currentSessionId = getSessionId();
+let isRequestInFlight = false;
+let lastUserMessage = null;
+
+// Typing indicator
+function showTypingIndicator() {
+  const chatMessages = document.getElementById('chat-messages');
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'message ai typing-indicator fade-in';
+  typingDiv.id = 'typing-indicator';
+  typingDiv.innerHTML = `
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  `;
+  chatMessages.appendChild(typingDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+  const typingDiv = document.getElementById('typing-indicator');
+  if (typingDiv) typingDiv.remove();
+}
+
+// Error display
+function showError(message) {
+  const chatMessages = document.getElementById('chat-messages');
+  removeTypingIndicator();
+
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'message ai error-message fade-in';
+  errorDiv.innerHTML = `
+    <div class="error-content">
+      <span class="error-icon">⚠️</span>
+      <p>${message}</p>
+      <button class="retry-btn" onclick="window.retryLastMessage()">Try Again</button>
+    </div>
+  `;
+  chatMessages.appendChild(errorDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+window.retryLastMessage = async function() {
+  const errorDiv = document.querySelector('.error-message');
+  if (errorDiv) errorDiv.remove();
+  if (lastUserMessage) {
+    await sendMessage(lastUserMessage);
+  }
+};
+
+// Main send message function
+async function sendMessage(manualText = null) {
+  if (isRequestInFlight) return;
+
+  const input = document.getElementById('user-input');
+  const chatMessages = document.getElementById('chat-messages');
+  const text = manualText || input.value.trim();
+
+  // Input validation
+  if (!text || text.length < 2) {
+    if (!manualText) {
+      input.focus();
+      input.style.borderColor = '#ef4444';
+      setTimeout(() => input.style.borderColor = '', 2000);
+    }
+    return;
+  }
+
+  if (!manualText) {
+    input.value = '';
+  }
+
+  isRequestInFlight = true;
+  lastUserMessage = text;
+
+  const sendBtn = document.getElementById('send-msg');
+  if (sendBtn) sendBtn.disabled = true;
+
+  // User message bubble
+  const userDiv = document.createElement('div');
+  userDiv.className = 'message user fade-in';
+  userDiv.textContent = text;
+  chatMessages.appendChild(userDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  showTypingIndicator();
+
+  try {
+    const aiRaw = await askJanMat(text, currentSessionId);
+    removeTypingIndicator();
+
+    const { thinking, answer, references, isValid } = parseAIResponse(aiRaw);
+    const parsedAnswer = window.marked ? window.marked.parse(answer) : answer;
+    const parsedRefs = references && window.marked ? window.marked.parse(references) : (references || '');
+
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'message ai fade-in markdown-body';
+
+    let html = '';
+
+    // Thinking Toggle
+    if (thinking) {
+      const thinkId = `think-${Date.now()}`;
+      html += `
+        <div class="thinking-toggle" onclick="document.getElementById('${thinkId}').classList.toggle('open')">
+          <span>🧠</span> Model Reasoning <span class="think-chevron">▾</span>
+        </div>
+        <div class="thinking-panel" id="${thinkId}">
+          <p>${thinking}</p>
+        </div>`;
+    }
+
+    // Main Answer
+    html += `<div class="ai-answer">${parsedAnswer}</div>`;
+
+    // References
+    if (references) {
+      html += `
+        <div class="references-panel">
+          <div class="ref-header">📚 Official Sources</div>
+          <div class="ref-body">${parsedRefs}</div>
+        </div>`;
+    }
+
+    // Format warning if needed
+    if (!isValid) {
+      html += `<div class="format-warning"><small>⚠️ Response format may be incomplete</small></div>`;
+    }
+
+    aiDiv.innerHTML = html;
+
+    // Follow-up Chips
+    const followUps = getFollowUpChips(text);
+    if (followUps && followUps.length > 0) {
+      const chipsDiv = document.createElement('div');
+      chipsDiv.className = 'suggestion-chips response-chips';
+      chipsDiv.innerHTML = `<div class="chips-label">💡 You might also want to ask:</div>` +
+        followUps.slice(0, 4).map(c =>
+          `<button class="chip" onclick="askChip('${c.q.replace(/'/g, "\\'")}')">
+            ${c.icon} ${c.label}<span>${c.sub}</span>
+          </button>`
+        ).join('');
+      aiDiv.appendChild(chipsDiv);
+    }
+
+    // Feedback Buttons
+    const feedbackDiv = document.createElement('div');
+    feedbackDiv.className = 'feedback-group';
+    feedbackDiv.innerHTML = `
+      <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')" title="Helpful">👍</button>
+      <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')" title="Not helpful">👎</button>
+    `;
+    aiDiv.appendChild(feedbackDiv);
+
+    chatMessages.appendChild(aiDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    logChatSession(text, answer);
+    isRequestInFlight = false;
+
+    if (sendBtn) sendBtn.disabled = false;
+  } catch (error) {
+    removeTypingIndicator();
+    console.error('Chat Error:', error);
+    showError(error.message || 'Something went wrong. Please try again.');
+    isRequestInFlight = false;
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+window.askChip = (question) => {
+  const input = document.getElementById('user-input');
+  if (input) {
+    input.value = question;
+    sendMessage();
+  }
+};
+
+window.handleFeedback = (query, type) => {
+  console.log(`Feedback: ${type} for: ${query}`);
+  alert("Namaste! Thank you for your feedback, Sir/Ma'am.");
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log('JanMat AI Initialized');
 
-  // Configure marked.js to open all links in new tabs safely
   if (window.marked) {
     const renderer = new window.marked.Renderer();
     renderer.link = (href, title, text) => {
@@ -203,7 +417,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Enter') sendMessage();
     });
 
-    // Buttery smooth placeholder rotation with opacity fade
+    // Clear error state on input
+    input.addEventListener('input', () => {
+      input.style.borderColor = '';
+    });
+
+    // Placeholder rotation
     const placeholders = [
       "e.g., How do I register as a first-time voter using Form 6?",
       "e.g., What is the difference between Lok Sabha & Vidhan Sabha?",
@@ -228,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
 
-  // Location Toggle Logic
+  // Location Toggle
   const btnRural = document.getElementById('toggle-rural');
   const btnUrban = document.getElementById('toggle-urban');
   if (btnRural && btnUrban) {
@@ -236,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnUrban.addEventListener('click', () => updateLocationContext('urban'));
   }
 
-  // Timeline Item Click logic
+  // Timeline interactions
   document.querySelectorAll('.timeline-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.timeline-item').forEach(i => i.classList.remove('active'));
@@ -266,119 +485,3 @@ function updateLocationContext(type) {
     h3.innerHTML = '<strong>How:</strong> Check your assigned polling station at a nearby Government School or Community Center.';
   }
 }
-
-function parseAIResponse(raw) {
-  const thinkingMatch = raw.match(/\[THINKING\]([\s\S]*?)\[\/THINKING\]/);
-  const answerMatch = raw.match(/\[ANSWER\]([\s\S]*?)\[\/ANSWER\]/);
-  const referencesMatch = raw.match(/\[REFERENCES\]([\s\S]*?)\[\/REFERENCES\]/);
-  return {
-    thinking: thinkingMatch ? thinkingMatch[1].trim() : null,
-    answer: answerMatch ? answerMatch[1].trim() : raw,
-    references: referencesMatch ? referencesMatch[1].trim() : null,
-  };
-}
-
-async function sendMessage() {
-  const input = document.getElementById('user-input');
-  const chatMessages = document.getElementById('chat-messages');
-  const text = input.value.trim();
-  if (!text) return;
-
-  // Append user message
-  const userDiv = document.createElement('div');
-  userDiv.className = 'message user fade-in';
-  userDiv.textContent = text;
-  chatMessages.appendChild(userDiv);
-  input.value = '';
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  // Skeleton Loader
-  const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'message ai skeleton-message fade-in';
-  loadingDiv.innerHTML = `
-    <div class="skeleton skeleton-text" style="width:65%;"></div>
-    <div class="skeleton skeleton-text" style="width:80%;margin-top:8px;"></div>
-    <div class="skeleton skeleton-text" style="width:50%;margin-top:8px;"></div>
-  `;
-  chatMessages.appendChild(loadingDiv);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  const aiRaw = await askJanMat(text);
-  chatMessages.removeChild(loadingDiv);
-
-  const { thinking, answer, references } = parseAIResponse(aiRaw);
-  const parsedAnswer = window.marked ? window.marked.parse(answer) : answer;
-  const parsedRefs = references && window.marked ? window.marked.parse(references) : (references || '');
-
-  const aiDiv = document.createElement('div');
-  aiDiv.className = 'message ai fade-in markdown-body';
-
-  let html = '';
-
-  // Thinking Toggle
-  if (thinking) {
-    const thinkId = `think-${Date.now()}`;
-    html += `
-      <div class="thinking-toggle" onclick="document.getElementById('${thinkId}').classList.toggle('open')">
-        <span>🧠</span> Model Reasoning <span class="think-chevron">▾</span>
-      </div>
-      <div class="thinking-panel" id="${thinkId}">
-        <p>${thinking}</p>
-      </div>`;
-  }
-
-  // Main Answer
-  html += `<div class="ai-answer">${parsedAnswer}</div>`;
-
-  // References
-  if (references) {
-    html += `
-      <div class="references-panel">
-        <div class="ref-header">📚 Official Sources</div>
-        <div class="ref-body">${parsedRefs}</div>
-      </div>`;
-  }
-
-  aiDiv.innerHTML = html;
-
-  // ── Contextual Follow-Up Chips ──
-  const followUps = getFollowUpChips(text);
-  if (followUps && followUps.length > 0) {
-    const chipsDiv = document.createElement('div');
-    chipsDiv.className = 'suggestion-chips response-chips';
-    chipsDiv.innerHTML = `<div class="chips-label">💡 You might also want to ask:</div>` +
-      followUps.slice(0, 4).map(c =>
-        `<button class="chip" onclick="askChip('${c.q.replace(/'/g, "\\'")}')">
-          ${c.icon} ${c.label}<span>${c.sub}</span>
-        </button>`
-      ).join('');
-    aiDiv.appendChild(chipsDiv);
-  }
-
-  // Feedback Buttons
-  const feedbackDiv = document.createElement('div');
-  feedbackDiv.className = 'feedback-group';
-  feedbackDiv.innerHTML = `
-    <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👍</button>
-    <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">👎</button>
-  `;
-  aiDiv.appendChild(feedbackDiv);
-
-  chatMessages.appendChild(aiDiv);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  logChatSession(text, answer);
-}
-
-window.askChip = (question) => {
-  const input = document.getElementById('user-input');
-  if (input) {
-    input.value = question;
-    sendMessage();
-  }
-};
-
-window.handleFeedback = (query, type) => {
-  console.log(`Feedback: ${type} for: ${query}`);
-  alert("Namaste! Thank you for your feedback, Sir/Ma'am.");
-};

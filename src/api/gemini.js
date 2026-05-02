@@ -1,17 +1,22 @@
 /**
  * Calls the JanMat AI Server (Generative AI Backend)
  * @param {string} prompt - User's query
+ * @param {string} [sessionId] - Optional session ID for conversation continuity
  * @returns {Promise<string>} - AI response
  */
-export async function askJanMat(prompt) {
+export async function askJanMat(prompt, sessionId = null) {
   try {
-    // In development, we use relative URL which Vite proxies or we call localhost:8080
-    // In production (Cloud Run), the frontend and backend are on the same domain
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (sessionId) {
+      headers['X-Session-Id'] = sessionId;
+    }
+
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ prompt }),
     });
 
@@ -24,6 +29,6 @@ export async function askJanMat(prompt) {
     return data.response;
   } catch (error) {
     console.error('Chat Error:', error);
-    return `Namaste! I'm having a bit of a technical glitch. Error details: ${error.message}`;
+    throw error; // Re-throw for better error handling in UI
   }
 }
