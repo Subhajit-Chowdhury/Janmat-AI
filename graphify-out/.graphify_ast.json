@@ -1,0 +1,540 @@
+{
+  "nodes": [
+    {
+      "id": "list_models_js",
+      "label": "list_models.js",
+      "file_type": "code",
+      "source_file": "list_models.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "list_models_run",
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "list_models.js",
+      "source_location": "L15"
+    },
+    {
+      "id": "main_js",
+      "label": "main.js",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "main_getfollowupchips",
+      "label": "getFollowUpChips()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L154"
+    },
+    {
+      "id": "main_parseairesponse",
+      "label": "parseAIResponse()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L174"
+    },
+    {
+      "id": "main_getsessionid",
+      "label": "getSessionId()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L207"
+    },
+    {
+      "id": "main_showtypingindicator",
+      "label": "showTypingIndicator()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L221"
+    },
+    {
+      "id": "main_removetypingindicator",
+      "label": "removeTypingIndicator()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L235"
+    },
+    {
+      "id": "main_showerror",
+      "label": "showError()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L241"
+    },
+    {
+      "id": "main_startrecording",
+      "label": "startRecording()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L305"
+    },
+    {
+      "id": "main_stoprecording",
+      "label": "stopRecording()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L314"
+    },
+    {
+      "id": "main_sendmessage",
+      "label": "sendMessage()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L320"
+    },
+    {
+      "id": "main_getdynamicgreeting",
+      "label": "getDynamicGreeting()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L483"
+    },
+    {
+      "id": "main_updatelocationcontext",
+      "label": "updateLocationContext()",
+      "file_type": "code",
+      "source_file": "main.js",
+      "source_location": "L571"
+    },
+    {
+      "id": "server_js",
+      "label": "server.js",
+      "file_type": "code",
+      "source_file": "server.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "server_getsessionid",
+      "label": "getSessionId()",
+      "file_type": "code",
+      "source_file": "server.js",
+      "source_location": "L123"
+    },
+    {
+      "id": "server_cleanupsession",
+      "label": "cleanupSession()",
+      "file_type": "code",
+      "source_file": "server.js",
+      "source_location": "L127"
+    },
+    {
+      "id": "vite_config_js",
+      "label": "vite.config.js",
+      "file_type": "code",
+      "source_file": "vite.config.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_api_api_test_js",
+      "label": "api.test.js",
+      "file_type": "code",
+      "source_file": "src\\api\\api.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_api_firebase_js",
+      "label": "firebase.js",
+      "file_type": "code",
+      "source_file": "src\\api\\firebase.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "firebase_logchatsession",
+      "label": "logChatSession()",
+      "file_type": "code",
+      "source_file": "src\\api\\firebase.js",
+      "source_location": "L19"
+    },
+    {
+      "id": "src_api_gemini_js",
+      "label": "gemini.js",
+      "file_type": "code",
+      "source_file": "src\\api\\gemini.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "gemini_askjanmat",
+      "label": "askJanMat()",
+      "file_type": "code",
+      "source_file": "src\\api\\gemini.js",
+      "source_location": "L7"
+    }
+  ],
+  "edges": [
+    {
+      "source": "list_models_js",
+      "target": "dotenv",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "list_models.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "list_models_js",
+      "target": "generative_ai",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "list_models.js",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "list_models_js",
+      "target": "list_models_run",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "list_models.js",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "style_css",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "src_api_gemini_ts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "src_api_firebase_ts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_getfollowupchips",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L154",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_parseairesponse",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L174",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_getsessionid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L207",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_showtypingindicator",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L221",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_removetypingindicator",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L235",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_showerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L241",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_startrecording",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L305",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_stoprecording",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L314",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_sendmessage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L320",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_getdynamicgreeting",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L483",
+      "weight": 1.0
+    },
+    {
+      "source": "main_js",
+      "target": "main_updatelocationcontext",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L571",
+      "weight": 1.0
+    },
+    {
+      "source": "main_showerror",
+      "target": "main_removetypingindicator",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L243",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "main_showtypingindicator",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L360",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "main_removetypingindicator",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L365",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "main_parseairesponse",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L367",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "main_getfollowupchips",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L409",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "main_showerror",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "main.js",
+      "source_location": "L441",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "express",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "path",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "url",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "dotenv",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "generative_ai",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "vertexai",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "server_getsessionid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "server_js",
+      "target": "server_cleanupsession",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.js",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "vite_config_js",
+      "target": "vite",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "vite.config.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_api_test_js",
+      "target": "vitest",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\api.test.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_api_test_js",
+      "target": "src_api_gemini_ts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\api.test.js",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_api_test_js",
+      "target": "src_api_firebase_ts",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\api.test.js",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_firebase_js",
+      "target": "app",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\firebase.js",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_firebase_js",
+      "target": "firestore",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\firebase.js",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_firebase_js",
+      "target": "firebase_logchatsession",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\firebase.js",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "src_api_gemini_js",
+      "target": "gemini_askjanmat",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src\\api\\gemini.js",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "gemini_askjanmat",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "main.js",
+      "source_location": "L364",
+      "weight": 1.0
+    },
+    {
+      "source": "main_sendmessage",
+      "target": "firebase_logchatsession",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "main.js",
+      "source_location": "L434",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

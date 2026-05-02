@@ -1,0 +1,119 @@
+{
+  "documents": [
+    {
+      "filename": "ARCHITECTURE.md",
+      "entities": [
+        {
+          "name": "UI",
+          "type": "Component",
+          "description": "Premium Glassmorphic User Interface"
+        },
+        {
+          "name": "main.js",
+          "type": "Module",
+          "description": "Controller module that routes user queries"
+        },
+        {
+          "name": "gemini.js",
+          "type": "Module",
+          "description": "Google Gemini API wrapper"
+        },
+        {
+          "name": "firebase.js",
+          "type": "Module",
+          "description": "Firebase Firestore wrapper"
+        },
+        {
+          "name": "Gemini 1.5 Flash",
+          "type": "Technology",
+          "description": "Google's LLM for conversational AI"
+        },
+        {
+          "name": "Cloud Firestore",
+          "type": "Service",
+          "description": "Serverless NoSQL database"
+        },
+        {
+          "name": "Google Cloud Run",
+          "type": "Service",
+          "description": "Containerized hosting with auto-scaling"
+        },
+        {
+          "name": "Vite",
+          "type": "Technology",
+          "description": "Frontend build tool for Vanilla JS"
+        }
+      ],
+      "relationships": [
+        {
+          "from": "UI",
+          "to": "main.js",
+          "type": "sends-query-to"
+        },
+        {
+          "from": "main.js",
+          "to": "gemini.js",
+          "type": "routes-to"
+        },
+        {
+          "from": "main.js",
+          "to": "firebase.js",
+          "type": "routes-to"
+        },
+        {
+          "from": "gemini.js",
+          "to": "Gemini 1.5 Flash",
+          "type": "wraps"
+        },
+        {
+          "from": "firebase.js",
+          "to": "Cloud Firestore",
+          "type": "connects-to"
+        }
+      ],
+      "key_terms": [
+        "Glassmorphism",
+        "System Instruction",
+        "Civic Consultant",
+        "Serverless",
+        "Auto-scaling"
+      ]
+    },
+    {
+      "filename": "DEPLOYMENT_GUIDE.md",
+      "entities": [
+        {
+          "name": "Gemini API Key",
+          "type": "Credential",
+          "description": "API authentication with 15 req/min free tier"
+        },
+        {
+          "name": "Google Cloud SDK",
+          "type": "Tool",
+          "description": "CLI for Google Cloud operations"
+        },
+        {
+          "name": ".env File",
+          "type": "Configuration",
+          "description": "Environment variable storage for credentials"
+        }
+      ],
+      "relationships": [],
+      "key_terms": [
+        "API Keys",
+        "Environment Variables",
+        "Deployment",
+        "Docker"
+      ]
+    }
+  ],
+  "cross_document_relationships": [
+    {
+      "from": "Gemini 1.5 Flash",
+      "file1": "ARCHITECTURE.md",
+      "to": "Gemini API Key",
+      "file2": "DEPLOYMENT_GUIDE.md",
+      "type": "requires"
+    }
+  ]
+}
