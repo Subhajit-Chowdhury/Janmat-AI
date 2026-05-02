@@ -130,7 +130,9 @@ nav a:hover {
 }
 
 /* Hero Section */
+/* Redesigned Hero Section */
 .hero-section {
+
   flex: 1;
   display: flex;
   align-items: center;
@@ -141,7 +143,7 @@ nav a:hover {
               radial-gradient(circle at 80% 70%, rgba(19, 136, 8, 0.1), transparent 40%);
 }
 
-.hero-content {
+.chat-container-main {
   max-width: 900px;
 }
 

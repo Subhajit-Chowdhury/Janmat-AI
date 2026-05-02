@@ -263,26 +263,75 @@ window.retryLastMessage = async function() {
   }
 };
 
+// Speech Recognition Setup
+let recognition = null;
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const input = document.getElementById('user-input');
+    if (input) {
+      input.value = transcript;
+      sendMessage();
+    }
+    stopRecording();
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+    stopRecording();
+    alert('Voice input error: ' + event.error);
+  };
+
+  recognition.onend = () => {
+    stopRecording();
+  };
+}
+
+function startRecording() {
+  if (!recognition) {
+    alert('Speech recognition is not supported in this browser.');
+    return;
+  }
+  document.getElementById('record-overlay').classList.remove('hidden');
+  recognition.start();
+}
+
+function stopRecording() {
+  document.getElementById('record-overlay').classList.add('hidden');
+  if (recognition) recognition.stop();
+}
+
 // Main send message function
 async function sendMessage(manualText = null) {
   if (isRequestInFlight) return;
 
   const input = document.getElementById('user-input');
   const chatMessages = document.getElementById('chat-messages');
+  const chatContainer = document.querySelector('.chat-container-main');
   const text = manualText || input.value.trim();
 
   // Input validation
   if (!text || text.length < 2) {
     if (!manualText) {
       input.focus();
-      input.style.borderColor = '#ef4444';
-      setTimeout(() => input.style.borderColor = '', 2000);
     }
     return;
   }
 
+  // Hide welcome screen on first message
+  if (chatContainer && !chatContainer.classList.contains('has-messages')) {
+    chatContainer.classList.add('has-messages');
+    document.getElementById('initial-suggestions').style.display = 'none';
+  }
+
   if (!manualText) {
     input.value = '';
+    input.style.height = 'auto'; // Reset height after send
   }
 
   isRequestInFlight = true;
@@ -301,6 +350,7 @@ async function sendMessage(manualText = null) {
   showTypingIndicator();
 
   try {
+    // Send raw prompt - AI will auto-detect language
     const aiRaw = await askJanMat(text, currentSessionId);
     removeTypingIndicator();
 
@@ -410,42 +460,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const sendBtn = document.getElementById('send-msg');
   const input = document.getElementById('user-input');
+  const micBtn = document.getElementById('mic-btn');
+  const stopRecordBtn = document.getElementById('stop-record');
 
   if (sendBtn) sendBtn.addEventListener('click', () => sendMessage());
+  if (micBtn) micBtn.addEventListener('click', startRecording);
+  if (stopRecordBtn) stopRecordBtn.addEventListener('click', stopRecording);
 
   if (input) {
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    // Clear error state on input
+    // Auto-resize textarea
     input.addEventListener('input', () => {
-      input.style.borderColor = '';
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 200) + 'px';
     });
 
-    // Placeholder rotation
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Initial placeholder logic
     const placeholders = [
-      "e.g., How do I register as a first-time voter using Form 6?",
-      "e.g., What is the difference between Lok Sabha & Vidhan Sabha?",
-      "e.g., Who conducts Panchayat elections — ECI or State?",
-      "e.g., I moved cities. How do I transfer my vote? (Form 8)",
-      "e.g., How is the Prime Minister of Bharat elected?",
-      "e.g., What is Special Intensive Revision (SIR) of electoral rolls?",
-      "e.g., How can I find my polling booth on election day?",
-      "e.g., What valid IDs can I use to vote at the booth?",
-      "e.g., How is the President of Bharat elected?",
-      "e.g., What is Form 7 and when do I use it?",
+      "Ask about Voter Registration...",
+      "What is Form 6?",
+      "How to find my polling booth?",
+      "Can I vote if I'm 17 but turning 18?",
+      "What documents do I need for Voter ID?",
     ];
     let pIndex = 0;
     setInterval(() => {
-      input.style.transition = 'opacity 0.5s ease';
-      input.style.opacity = '0.25';
-      setTimeout(() => {
-        pIndex = (pIndex + 1) % placeholders.length;
-        input.setAttribute('placeholder', placeholders[pIndex]);
-        input.style.opacity = '1';
-      }, 500);
-    }, 4000);
+      pIndex = (pIndex + 1) % placeholders.length;
+      input.setAttribute('placeholder', placeholders[pIndex]);
+    }, 5000);
   }
 
   // Location Toggle

@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./ui.css">
     <script>
       function scrollToSection(id) {
         document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
@@ -62,60 +63,70 @@
 
       <main id="home" class="hero-section">
         <div class="chat-container-main fade-in">
-          <div class="chat-header">
-            <div class="chat-title">
-              <span class="pulse-icon"></span>
-              <h2>JanMat AI Assistant</h2>
-            </div>
-            <div class="language-selector">
-              <select id="lang-select" aria-label="Select Language">
-                <option value="en">English</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="bn">বাংলা (Bengali)</option>
-                <option value="te">తెలుగు (Telugu)</option>
-                <option value="mr">मराठी (Marathi)</option>
-                <option value="ta">தமிழ் (Tamil)</option>
-                <option value="ur">اردو (Urdu)</option>
-                <option value="gu">ગુજરાતી (Gujarati)</option>
-                <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                <option value="or">ଓଡ଼ିଆ (Odia)</option>
-                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-                <option value="ml">മലയാളം (Malayalam)</option>
-              </select>
-            </div>
+          <div class="chat-welcome" id="chat-welcome">
+            <h1 class="welcome-title">What can I help with?</h1>
           </div>
 
           <div class="primary-chat" id="chat">
             <div class="chat-messages" id="chat-messages">
-              <div class="message ai">
-                <div class="ai-avatar">AI</div>
-                <div class="ai-text">
-                  <p><strong>Namaste!</strong> I am your JanMat AI election guide. 🙏</p>
-                  <p>How can I help you navigate the world's largest democracy today? You can ask me in any language!</p>
-                  <div class="welcome-suggestions">
-                    <button class="chip" onclick="askChip('How do I register to vote?')">🗳️ Register to Vote</button>
-                    <button class="chip" onclick="askChip('What is Form 6?')">📄 Form 6 Guide</button>
-                    <button class="chip" onclick="askChip('How to find my polling booth?')">📍 Find Booth</button>
-                  </div>
-                </div>
-              </div>
+              <!-- Messages will appear here -->
             </div>
             
             <div class="ai-input-wrapper">
-              <div class="input-container">
-                <textarea id="user-input" placeholder="Ask JanMat anything..." rows="1"></textarea>
-                <button id="send-msg" class="send-btn" aria-label="Send Message">
-                  <svg viewBox="0 0 24 24" width="24" height="24">
-                    <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-                  </svg>
+              <div class="input-container-floating">
+                <div class="input-actions-left">
+                  <button id="mic-btn" class="action-btn mic-btn" aria-label="Voice Input">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
+                      <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
+                    </svg>
+                  </button>
+                </div>
+                <textarea id="user-input" placeholder="Ask anything about Indian elections..." rows="1"></textarea>
+                <div class="input-actions-right">
+                  <button id="send-msg" class="send-btn-minimal" aria-label="Send Message">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="welcome-suggestions-row" id="initial-suggestions">
+                <button class="suggestion-card" onclick="askChip('How do I register to vote?')">
+                  <span class="card-icon">🗳️</span>
+                  <div class="card-text">
+                    <strong>Register to Vote</strong>
+                    <p>New voter guide</p>
+                  </div>
+                </button>
+                <button class="suggestion-card" onclick="askChip('What is Form 6?')">
+                  <span class="card-icon">📄</span>
+                  <div class="card-text">
+                    <strong>Form 6 Guide</strong>
+                    <p>New application</p>
+                  </div>
+                </button>
+                <button class="suggestion-card" onclick="askChip('How to find my polling booth?')">
+                  <span class="card-icon">📍</span>
+                  <div class="card-text">
+                    <strong>Find Booth</strong>
+                    <p>Locate station</p>
+                  </div>
                 </button>
               </div>
-              <div class="input-footer">
-                <span>Press Enter to send</span>
-                <span class="sep">•</span>
-                <span>Verified ECI Info</span>
+
+              <div class="input-footer-minimal">
+                <span>Verified ECI Information & Bharat Election Guide</span>
               </div>
             </div>
+          </div>
+        </div>
+        <div id="record-overlay" class="record-overlay hidden">
+          <div class="record-content">
+            <div class="record-pulse"></div>
+            <p>Listening...</p>
+            <button id="stop-record" class="stop-record-btn">Done</button>
           </div>
         </div>
       </main>
