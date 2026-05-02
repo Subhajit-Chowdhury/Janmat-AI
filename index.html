@@ -4,19 +4,14 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JanMat AI | Bharat Election Guide</title>
+    <title>JanMat AI | India's Election Assistant</title>
     <link rel="icon" type="image/png" href="janmat_favicon_1777406527353.png">
-    <meta name="description" content="AI assistant for Indian elections. Get instant answers about voting, voter registration, and democratic processes.">
+    <meta name="description" content="JanMat AI — your trusted AI guide for Indian elections. Ask about voter registration, polling booths, forms, and more in any language.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./ui.css">
-    <script>
-      function scrollToSection(id) {
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-      }
-    </script>
   </head>
   <body>
     <div id="app">
@@ -54,11 +49,6 @@
           </svg>
           JanMat<span>AI</span>
         </a>
-        <nav>
-          <a href="#chat">Chat</a>
-          <a href="#process">Voter Journey</a>
-          <a href="#faqs">FAQs</a>
-        </nav>
       </header>
 
       <main id="home" class="hero-section">
@@ -68,72 +58,72 @@
             <p class="welcome-subtitle" id="dynamic-subtitle">Your trusted AI guide for Indian elections — ask in any language 🇮🇳</p>
           </div>
 
-            <div class="chat-messages" id="chat-messages">
-              <!-- Messages will appear here -->
+          <div class="chat-messages" id="chat-messages">
+            <!-- Messages will appear here -->
+          </div>
+          
+          <div class="ai-input-wrapper">
+            <div class="input-container-floating" id="input-pill">
+              <div class="input-actions-left">
+                <button id="new-chat-plus" class="action-btn plus-btn" onclick="clearChat()" title="New Chat" aria-label="New Chat">
+                  <svg viewBox="0 0 24 24" width="22" height="22">
+                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                  </svg>
+                </button>
+              </div>
+              <textarea id="user-input" placeholder="Ask anything about Indian elections..." rows="1"></textarea>
+              <div class="input-actions-right">
+                <button id="mic-btn" class="action-btn mic-btn" aria-label="Voice Input" title="Speak your question">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
+                    <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
+                  </svg>
+                </button>
+                <button id="send-msg" class="send-btn-round" aria-label="Send Message">
+                  <svg viewBox="0 0 24 24" width="22" height="22">
+                    <path fill="currentColor" d="M12 3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2s2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2V9c0-1.1-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2V9c0-1.1-.9-2-2-2z"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
             
-            <div class="ai-input-wrapper">
-              <div class="input-container-floating" id="input-pill">
-                <div class="input-actions-left">
-                  <button id="new-chat-plus" class="action-btn plus-btn" onclick="clearChat()" title="New Chat" aria-label="New Chat">
-                    <svg viewBox="0 0 24 24" width="22" height="22">
-                      <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
-                    </svg>
-                  </button>
+            <div class="welcome-suggestions-row" id="initial-suggestions">
+              <button class="suggestion-card" onclick="askChip('How do I register to vote?')">
+                <span class="card-icon">🗳️</span>
+                <div class="card-text">
+                  <strong>Register to Vote</strong>
+                  <p>Step-by-step guide</p>
                 </div>
-                <textarea id="user-input" placeholder="Ask anything about Indian elections..." rows="1"></textarea>
-                <div class="input-actions-right">
-                  <button id="mic-btn" class="action-btn mic-btn" aria-label="Voice Input" title="Speak your question">
-                    <svg viewBox="0 0 24 24" width="18" height="18">
-                      <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
-                      <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
-                    </svg>
-                  </button>
-                  <button id="send-msg" class="send-btn-round" aria-label="Send Message">
-                    <svg viewBox="0 0 24 24" width="22" height="22">
-                      <path fill="currentColor" d="M12 3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2s2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2V9c0-1.1-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2V9c0-1.1-.9-2-2-2z"></path>
-                    </svg>
-                  </button>
+              </button>
+              <button class="suggestion-card" onclick="askChip('What is Form 6 and how to fill it?')">
+                <span class="card-icon">📋</span>
+                <div class="card-text">
+                  <strong>Form 6 Guide</strong>
+                  <p>New voter application</p>
                 </div>
-              </div>
-              
-              <div class="welcome-suggestions-row" id="initial-suggestions">
-                <button class="suggestion-card" onclick="askChip('How do I register to vote?')">
-                  <span class="card-icon">🗳️</span>
-                  <div class="card-text">
-                    <strong>Register to Vote</strong>
-                    <p>Step-by-step guide</p>
-                  </div>
-                </button>
-                <button class="suggestion-card" onclick="askChip('What is Form 6 and how to fill it?')">
-                  <span class="card-icon">📋</span>
-                  <div class="card-text">
-                    <strong>Form 6 Guide</strong>
-                    <p>New voter application</p>
-                  </div>
-                </button>
-                <button class="suggestion-card" onclick="askChip('How to find my polling booth?')">
-                  <span class="card-icon">📍</span>
-                  <div class="card-text">
-                    <strong>Find My Booth</strong>
-                    <p>Locate polling station</p>
-                  </div>
-                </button>
-                <button class="suggestion-card" onclick="askChip('What valid IDs can I use to vote?')">
-                  <span class="card-icon">🪪</span>
-                  <div class="card-text">
-                    <strong>Valid IDs to Vote</strong>
-                    <p>12 accepted documents</p>
-                  </div>
-                </button>
-              </div>
+              </button>
+              <button class="suggestion-card" onclick="askChip('How to find my polling booth?')">
+                <span class="card-icon">📍</span>
+                <div class="card-text">
+                  <strong>Find My Booth</strong>
+                  <p>Locate polling station</p>
+                </div>
+              </button>
+              <button class="suggestion-card" onclick="askChip('What valid IDs can I use to vote?')">
+                <span class="card-icon">🪪</span>
+                <div class="card-text">
+                  <strong>Valid IDs to Vote</strong>
+                  <p>12 accepted documents</p>
+                </div>
+              </button>
+            </div>
 
-              <div class="input-footer-minimal">
-                <span>Verified by Election Commission of India · Ask in Hindi, Bengali, Tamil or any language</span>
-              </div>
+            <div class="input-footer-minimal">
+              <span>Verified by Election Commission of India · Ask in Hindi, Bengali, Tamil or any language</span>
             </div>
           </div>
         </div>
+
         <div id="record-overlay" class="record-overlay hidden">
           <div class="record-content">
             <div class="record-pulse"></div>
@@ -148,109 +138,9 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
       </button>
 
-      <!-- Voter Journey Timeline -->
-      <section id="process" class="process-section glass-container">
-        <h2 class="section-title">Your Voter Journey</h2>
-        
-        <div class="location-toggle-container">
-          <span class="toggle-label">Applying from:</span>
-          <div class="toggle-switch">
-            <button id="toggle-rural" class="toggle-btn active">Village / Rural</button>
-            <button id="toggle-urban" class="toggle-btn">Town / Urban</button>
-          </div>
-        </div>
-
-        <div class="timeline" id="election-timeline">
-          <div class="timeline-item active magic-glow" data-step="1">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <h3>Voter Registration</h3>
-              <p id="step-1-how"><strong>How:</strong> Apply online at <a href="https://voters.eci.gov.in/" target="_blank" class="inline-link">voters.eci.gov.in</a>. Rural BLOs coordinate with Gram Panchayats.</p>
-              <div class="details"><a href="https://voters.eci.gov.in/" target="_blank">Register at voters.eci.gov.in ↗</a></div>
-            </div>
-          </div>
-          <div class="timeline-item magic-glow" data-step="2">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <h3>Verification</h3>
-              <p id="step-2-how"><strong>How:</strong> BLO visits for verification. Track status at <a href="https://voters.eci.gov.in/voter/search" target="_blank" class="inline-link">voters.eci.gov.in/voter/search</a></p>
-              <div class="details"><a href="https://voters.eci.gov.in/voter/search" target="_blank">Check Status ↗</a></div>
-            </div>
-          </div>
-          <div class="timeline-item magic-glow" data-step="3">
-            <div class="step-num">3</div>
-            <div class="step-content">
-              <h3>Cast Your Vote</h3>
-              <p><strong>How:</strong> Find booth at <a href="https://electoralsearch.eci.gov.in/" target="_blank" class="inline-link">electoralsearch.eci.gov.in</a> with your EPIC ID.</p>
-              <div class="details"><a href="https://electoralsearch.eci.gov.in/" target="_blank">Find Booth ↗</a></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Essential Tools -->
-      <section id="tools" class="tools-section glass-container">
-        <h2 class="section-title">Essential Tools</h2>
-        <div class="tools-grid">
-          <a href="https://voters.eci.gov.in/" target="_blank" class="tool-card magic-glow">
-            <div class="tool-icon">🌐</div>
-            <h3>ECI Portal</h3>
-            <p>Official voter registration & services</p>
-            <span class="tool-url">voters.eci.gov.in ↗</span>
-          </a>
-          <a href="https://eci.gov.in/" target="_blank" class="tool-card magic-glow">
-            <div class="tool-icon">📊</div>
-            <h3>Election Commission</h3>
-            <p>National election information</p>
-            <span class="tool-url">eci.gov.in ↗</span>
-          </a>
-          <a href="https://ceodelhi.gov.in/" target="_blank" class="tool-card magic-glow">
-            <div class="tool-icon">🏛️</div>
-            <h3>CEO Delhi</h3>
-            <p>Delhi-specific election services</p>
-            <span class="tool-url">ceodelhi.gov.in ↗</span>
-          </a>
-          <a href="https://electoralsearch.eci.gov.in/" target="_blank" class="tool-card magic-glow">
-            <div class="tool-icon">🔍</div>
-            <h3>Check Voter List</h3>
-            <p>Verify your registration status</p>
-            <span class="tool-url">electoralsearch.eci.gov.in ↗</span>
-          </a>
-        </div>
-      </section>
-
-      <!-- FAQs -->
-      <section id="faqs" class="faq-section">
-        <div class="glass-container">
-          <h2 class="section-title">Quick FAQs</h2>
-          <div class="faq-grid">
-            <div class="faq-card magic-glow">
-              <h3>📋 Form 6</h3>
-              <p>New voter registration. Required if you're 18+ and not registered.</p>
-            </div>
-            <div class="faq-card magic-glow">
-              <h3>📝 Form 8</h3>
-              <p>Correct name, address, or transfer constituency.</p>
-            </div>
-            <div class="faq-card magic-glow">
-              <h3>📍 Find Booth</h3>
-              <p>Use EPIC number at voters.eci.gov.in to find polling station.</p>
-            </div>
-            <div class="faq-card magic-glow">
-              <h3>🆔 e-EPIC</h3>
-              <p>Digital Voter ID downloadable from NVSP portal.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <footer class="footer">
         <div class="footer-content">
-          <p>© 2026 JanMat AI - Built with Google Gemini for Bharat's Democracy</p>
-          <div class="footer-links">
-            <a href="https://voters.eci.gov.in/" target="_blank">ECI Portal</a>
-            <a href="https://eci.gov.in/" target="_blank">Election Commission</a>
-          </div>
+          <p>© 2026 JanMat AI — Built with Google Gemini for Bharat's Democracy</p>
         </div>
       </footer>
     </div>
