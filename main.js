@@ -295,69 +295,141 @@ window.retryLastMessage = async function() {
 
 // Speech Recognition Setup
 let recognition = null;
+let isListening = false;
+
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
-  recognition.interimResults = false;
-  
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += t;
+      else interim += t;
+    }
     const input = document.getElementById('user-input');
     if (input) {
-      input.value = transcript;
-      sendMessage();
+      input.value = final || interim;
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 200) + 'px';
     }
-    stopRecording();
+    showVoiceToast(final ? `✅ "${final.trim()}"` : `🎙️ ${interim}...`, final ? 'processing' : 'listening');
   };
 
   recognition.onerror = (event) => {
-    console.error('Speech recognition error:', event.error);
-    stopRecording();
-    alert('Voice input error: ' + event.error);
+    isListening = false;
+    setMicActive(false);
+    const msgs = {
+      'no-speech': 'No speech detected. Try again.',
+      'audio-capture': 'No microphone found.',
+      'not-allowed': 'Microphone access denied — please allow mic in browser settings.',
+      'network': 'Network error. Check your connection.',
+    };
+    showVoiceToast(`❌ ${msgs[event.error] || 'Error: ' + event.error}`, 'error');
+    setTimeout(hideVoiceToast, 3500);
   };
 
   recognition.onend = () => {
-    stopRecording();
+    isListening = false;
+    setMicActive(false);
+    const input = document.getElementById('user-input');
+    const val = input ? input.value.trim() : '';
+    if (val) {
+      showVoiceToast(`✅ Sending: "${val}"`, 'processing');
+      setTimeout(() => { hideVoiceToast(); sendMessage(); }, 600);
+    } else {
+      hideVoiceToast();
+    }
   };
 }
 
+// Voice UI helpers
+function showVoiceToast(text, state = 'listening') {
+  let toast = document.getElementById('voice-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'voice-toast';
+    toast.style.cssText = [
+      'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
+      'background:rgba(10,10,15,0.96)', 'border:1px solid rgba(255,153,51,0.4)',
+      'color:#fff', 'padding:10px 22px', 'border-radius:50px', 'font-size:0.88rem',
+      'z-index:9999', 'display:flex', 'align-items:center', 'gap:10px',
+      'backdrop-filter:blur(14px)', 'box-shadow:0 8px 30px rgba(0,0,0,0.5)',
+      'transition:opacity 0.3s ease', 'white-space:nowrap'
+    ].join(';');
+    document.body.appendChild(toast);
+  }
+  const colors = { listening: '#FF9933', processing: '#138808', error: '#ef4444' };
+  const color = colors[state] || '#FF9933';
+  const anim = state === 'listening' ? 'animation:micPulse 0.8s ease infinite alternate;' : '';
+  const dot = `<span style="width:9px;height:9px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;${anim}"></span>`;
+  toast.innerHTML = `${dot} ${text}`;
+  toast.style.opacity = '1';
+}
+
+function hideVoiceToast() {
+  const toast = document.getElementById('voice-toast');
+  if (!toast) return;
+  toast.style.opacity = '0';
+  setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+}
+
+function setMicActive(active) {
+  const btn = document.getElementById('mic-btn');
+  if (!btn) return;
+  if (active) {
+    btn.style.color = '#FF9933';
+    btn.style.transform = 'scale(1.2)';
+    btn.title = 'Click to stop';
+  } else {
+    btn.style.color = '';
+    btn.style.transform = '';
+    btn.title = 'Speak your question';
+  }
+}
+
 function startRecording() {
+  if (isListening) { stopRecording(); return; }
   if (!recognition) {
-    alert('Speech recognition is not supported in this browser. Please try Chrome or Edge.');
+    showVoiceToast('Voice not supported. Try Chrome or Edge.', 'error');
+    setTimeout(hideVoiceToast, 3000);
     return;
   }
-  const micBtn = document.getElementById('mic-btn');
-  micBtn.classList.add('recording');
-  document.getElementById('record-overlay').classList.remove('hidden');
+  recognition.lang = navigator.language || 'en-IN';
+  isListening = true;
+  setMicActive(true);
+  showVoiceToast('🎙️ Listening… Speak now', 'listening');
   try {
     recognition.start();
   } catch (e) {
-    console.error('Recognition already started', e);
+    isListening = false;
+    setMicActive(false);
+    hideVoiceToast();
   }
 }
 
 function stopRecording() {
-  const micBtn = document.getElementById('mic-btn');
-  if (micBtn) micBtn.classList.remove('recording');
-  document.getElementById('record-overlay').classList.add('hidden');
-  if (recognition) {
+  if (recognition && isListening) {
     try { recognition.stop(); } catch (e) {}
   }
+  isListening = false;
+  setMicActive(false);
 }
 
-// Initial Listener Setup
+// Inject micPulse animation
+const _micStyle = document.createElement('style');
+_micStyle.textContent = '@keyframes micPulse { from{opacity:.5;transform:scale(.9)} to{opacity:1;transform:scale(1.1)} }';
+document.head.appendChild(_micStyle);
+
+// Initial mic button listener
 document.addEventListener('DOMContentLoaded', () => {
   const micBtn = document.getElementById('mic-btn');
-  if (micBtn) {
-    micBtn.addEventListener('click', () => {
-      if (micBtn.classList.contains('recording')) {
-        stopRecording();
-      } else {
-        startRecording();
-      }
-    });
-  }
+  if (micBtn) micBtn.addEventListener('click', startRecording);
 });
 
 // Main send message function
@@ -810,176 +882,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.hideScrollToBottom = hideScrollToBottom;
 });
 
-// ── VOICE INPUT (Web Speech API / Google Speech-to-Text) ──────────────────
-let recognition = null;
-let isListening = false;
-
-function initSpeechRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return null;
-
-  const rec = new SpeechRecognition();
-  rec.continuous = false;
-  rec.interimResults = true;
-  // Detect all Indian languages + English automatically
-  rec.lang = 'hi-IN';
-  rec.maxAlternatives = 1;
-  return rec;
-}
-
-function showVoiceToast(text, state = 'listening') {
-  let toast = document.getElementById('voice-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'voice-toast';
-    toast.style.cssText = `
-      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-      background: rgba(10,10,15,0.95); border: 1px solid rgba(255,153,51,0.4);
-      color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.88rem;
-      z-index: 9999; display: flex; align-items: center; gap: 10px;
-      backdrop-filter: blur(12px); box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      transition: opacity 0.3s ease;
-    `;
-    document.body.appendChild(toast);
-  }
-
-  const dot = state === 'listening'
-    ? '<span style="width:10px;height:10px;border-radius:50%;background:#FF9933;display:inline-block;animation:micPulse 0.8s ease infinite alternate;"></span>'
-    : state === 'processing'
-    ? '<span style="width:10px;height:10px;border-radius:50%;background:#138808;display:inline-block;"></span>'
-    : '<span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;"></span>';
-
-  toast.innerHTML = `${dot} ${text}`;
-  toast.style.opacity = '1';
-}
-
-function hideVoiceToast() {
-  const toast = document.getElementById('voice-toast');
-  if (toast) {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }
-}
-
-function setMicActive(active) {
-  const micBtn = document.getElementById('mic-btn');
-  if (!micBtn) return;
-  if (active) {
-    micBtn.style.color = '#FF9933';
-    micBtn.style.transform = 'scale(1.2)';
-    micBtn.title = 'Click to stop listening';
-  } else {
-    micBtn.style.color = '';
-    micBtn.style.transform = '';
-    micBtn.title = 'Speak your question';
-  }
-}
-
-function startRecording() {
-  if (isListening) {
-    stopRecording();
-    return;
-  }
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    showVoiceToast('Voice input not supported in this browser. Try Chrome or Edge.', 'error');
-    setTimeout(hideVoiceToast, 3000);
-    return;
-  }
-
-  recognition = initSpeechRecognition();
-  isListening = true;
-  setMicActive(true);
-  showVoiceToast('🎙️ Listening... Speak now', 'listening');
-
-  const input = document.getElementById('user-input');
-
-  recognition.onstart = () => {
-    showVoiceToast('🎙️ Listening... Speak now', 'listening');
-  };
-
-  recognition.onresult = (event) => {
-    let interim = '';
-    let final = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) final += t;
-      else interim += t;
-    }
-    // Show interim text in the input box as preview
-    if (input) {
-      input.value = final || interim;
-      input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 200) + 'px';
-    }
-    if (final) {
-      showVoiceToast(`✅ "${final.trim()}"`, 'processing');
-    } else {
-      showVoiceToast(`🎙️ ${interim}...`, 'listening');
-    }
-  };
-
-  recognition.onerror = (event) => {
-    isListening = false;
-    setMicActive(false);
-    const msgs = {
-      'no-speech': 'No speech detected. Try again.',
-      'audio-capture': 'No microphone found.',
-      'not-allowed': 'Microphone permission denied. Please allow mic access.',
-      'network': 'Network error — check your connection.',
-    };
-    showVoiceToast(`❌ ${msgs[event.error] || 'Voice error: ' + event.error}`, 'error');
-    setTimeout(hideVoiceToast, 3000);
-  };
-
-  recognition.onend = () => {
-    isListening = false;
-    setMicActive(false);
-    const input = document.getElementById('user-input');
-    const val = input ? input.value.trim() : '';
-    if (val) {
-      showVoiceToast(`✅ Sending: "${val}"`, 'processing');
-      setTimeout(() => {
-        hideVoiceToast();
-        sendMessage();
-      }, 700);
-    } else {
-      hideVoiceToast();
-    }
-  };
-
-  // Auto language detection — try to match common Indian language patterns
-  // Default to hi-IN; the recognition API handles multilingual naturally in Chrome
-  recognition.lang = navigator.language || 'hi-IN';
-
-  try {
-    recognition.start();
-  } catch (e) {
-    isListening = false;
-    setMicActive(false);
-    showVoiceToast('Could not start microphone. Please try again.', 'error');
-    setTimeout(hideVoiceToast, 3000);
-  }
-}
-
-function stopRecording() {
-  if (recognition && isListening) {
-    recognition.stop();
-  }
-  isListening = false;
-  setMicActive(false);
-}
-
-// Inject micPulse animation into the page
-const micStyle = document.createElement('style');
-micStyle.textContent = `
-  @keyframes micPulse {
-    from { opacity: 0.5; transform: scale(0.9); }
-    to   { opacity: 1;   transform: scale(1.1); }
-  }
-`;
-document.head.appendChild(micStyle);
 
 function updateLocationContext(type) {
   const btnRural = document.getElementById('toggle-rural');
