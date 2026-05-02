@@ -217,24 +217,44 @@ let currentSessionId = getSessionId();
 let isRequestInFlight = false;
 let lastUserMessage = null;
 
-// Typing indicator
-function showTypingIndicator() {
+// ── Skeleton Loading Screen ──
+function showSkeletonLoader() {
   const chatMessages = document.getElementById('chat-messages');
-  const typingDiv = document.createElement('div');
-  typingDiv.className = 'message ai typing-indicator fade-in';
-  typingDiv.id = 'typing-indicator';
-  typingDiv.innerHTML = `
-    <div class="typing-dots">
-      <span></span><span></span><span></span>
+  const skeletonDiv = document.createElement('div');
+  skeletonDiv.className = 'message ai skeleton-message fade-in';
+  skeletonDiv.id = 'skeleton-loader';
+  skeletonDiv.innerHTML = `
+    <div class="skeleton-avatar"></div>
+    <div class="skeleton-body">
+      <div class="skeleton-line skeleton-line--long"></div>
+      <div class="skeleton-line skeleton-line--medium"></div>
+      <div class="skeleton-line skeleton-line--short"></div>
+      <div class="skeleton-line skeleton-line--medium"></div>
+      <div class="skeleton-typing-label">✨ JanMat AI is thinking...</div>
     </div>
   `;
-  chatMessages.appendChild(typingDiv);
+  chatMessages.appendChild(skeletonDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
+  showScrollToBottom();
 }
 
-function removeTypingIndicator() {
-  const typingDiv = document.getElementById('typing-indicator');
-  if (typingDiv) typingDiv.remove();
+function removeSkeletonLoader() {
+  const skeletonDiv = document.getElementById('skeleton-loader');
+  if (skeletonDiv) skeletonDiv.remove();
+}
+
+// Legacy alias kept for any other references
+function showTypingIndicator() { showSkeletonLoader(); }
+function removeTypingIndicator() { removeSkeletonLoader(); }
+
+// ── Scroll to Bottom Button ──
+function showScrollToBottom() {
+  const btn = document.getElementById('scroll-bottom-btn');
+  if (btn) btn.classList.add('visible');
+}
+function hideScrollToBottom() {
+  const btn = document.getElementById('scroll-bottom-btn');
+  if (btn) btn.classList.remove('visible');
 }
 
 // Error display
@@ -357,19 +377,23 @@ async function sendMessage(manualText = null) {
   chatMessages.appendChild(userDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  showTypingIndicator();
+  showSkeletonLoader();
 
   try {
-    // Send raw prompt - AI will auto-detect language
+    // Send raw prompt - AI will auto-detect language and respond in same language
     const aiRaw = await askJanMat(text, currentSessionId);
-    removeTypingIndicator();
+    removeSkeletonLoader();
 
     const { thinking, answer, references, isValid } = parseAIResponse(aiRaw);
     const parsedAnswer = window.marked ? window.marked.parse(answer) : answer;
     const parsedRefs = references && window.marked ? window.marked.parse(references) : (references || '');
 
+    const msgId = `ai-msg-${Date.now()}`;
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     const aiDiv = document.createElement('div');
-    aiDiv.className = 'message ai fade-in markdown-body';
+    aiDiv.className = 'message ai fade-in markdown-body ai-glow-msg';
+    aiDiv.id = msgId;
 
     let html = `<div class="ai-avatar">AI</div><div class="ai-text">`;
 
@@ -388,19 +412,32 @@ async function sendMessage(manualText = null) {
     // Main Answer
     html += `<div class="ai-answer">${parsedAnswer}</div>`;
 
-    // References
-    if (references) {
-      html += `
-        <div class="references-panel">
-          <div class="ref-header">📚 Official Sources</div>
-          <div class="ref-body">${parsedRefs}</div>
-        </div>`;
-    }
+    // References — always show with canonical ECI links
+    const defaultRefs = `
+      <ul>
+        <li><a href="https://voters.eci.gov.in" target="_blank" rel="noopener noreferrer">🌐 voters.eci.gov.in</a> — Voter registration, Form 6/8, e-EPIC download</li>
+        <li><a href="https://eci.gov.in" target="_blank" rel="noopener noreferrer">🏛️ eci.gov.in</a> — Election Commission of India (official)</li>
+        <li><a href="https://nvsp.in" target="_blank" rel="noopener noreferrer">📋 nvsp.in</a> — National Voter Service Portal</li>
+        <li><a href="https://ceodelhi.gov.in" target="_blank" rel="noopener noreferrer">📍 ceodelhi.gov.in</a> — Delhi Chief Electoral Officer</li>
+      </ul>`;
+    const refsHtml = references ? parsedRefs : defaultRefs;
+    html += `
+      <div class="references-panel">
+        <div class="ref-header" onclick="this.nextElementSibling.classList.toggle('open-refs')">📚 Official References <span class="ref-chevron">▾</span></div>
+        <div class="ref-body open-refs">${refsHtml}</div>
+      </div>`;
 
     // Format warning if needed
     if (!isValid) {
       html += `<div class="format-warning"><small>⚠️ Response format may be incomplete</small></div>`;
     }
+
+    // Action Bar (copy + timestamp)
+    html += `
+      <div class="msg-action-bar">
+        <span class="msg-timestamp">${timestamp}</span>
+        <button class="copy-msg-btn" onclick="copyMessageText('${msgId}')" title="Copy response">📋 Copy</button>
+      </div>`;
 
     html += `</div></div>`;
     aiDiv.innerHTML = html;
@@ -423,20 +460,21 @@ async function sendMessage(manualText = null) {
     const feedbackDiv = document.createElement('div');
     feedbackDiv.className = 'feedback-group';
     feedbackDiv.innerHTML = `
-      <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'up')" title="Helpful">👍</button>
-      <button class="feedback-btn" onclick="handleFeedback('${text.replace(/'/g, "\\'")}', 'down')" title="Not helpful">👎</button>
+      <button class="feedback-btn" onclick="handleFeedback(this)" data-type="up" title="Helpful">👍</button>
+      <button class="feedback-btn" onclick="handleFeedback(this)" data-type="down" title="Not helpful">👎</button>
     `;
     aiDiv.appendChild(feedbackDiv);
 
     chatMessages.appendChild(aiDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    hideScrollToBottom();
 
     logChatSession(text, answer);
     isRequestInFlight = false;
 
     if (sendBtn) sendBtn.disabled = false;
   } catch (error) {
-    removeTypingIndicator();
+    removeSkeletonLoader();
     console.error('Chat Error:', error);
     showError(error.message || 'Something went wrong. Please try again.');
     isRequestInFlight = false;
@@ -452,9 +490,54 @@ window.askChip = (question) => {
   }
 };
 
-window.handleFeedback = (query, type) => {
-  console.log(`Feedback: ${type} for: ${query}`);
-  alert("Namaste! Thank you for your feedback, Sir/Ma'am.");
+window.handleFeedback = (btn) => {
+  const type = btn.dataset.type;
+  const group = btn.closest('.feedback-group');
+  if (!group) return;
+  group.querySelectorAll('.feedback-btn').forEach(b => b.classList.remove('fb-active'));
+  btn.classList.add('fb-active');
+  btn.textContent = type === 'up' ? '👍 Thanks!' : '👎 Noted';
+  setTimeout(() => {
+    group.querySelectorAll('.feedback-btn').forEach(b => b.classList.remove('fb-active'));
+    btn.textContent = type === 'up' ? '👍' : '👎';
+  }, 2000);
+};
+
+// Copy AI message text
+window.copyMessageText = function(msgId) {
+  const msgEl = document.getElementById(msgId);
+  if (!msgEl) return;
+  const answerEl = msgEl.querySelector('.ai-answer');
+  const text = answerEl ? answerEl.innerText : msgEl.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = msgEl.querySelector('.copy-msg-btn');
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+    }
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+};
+
+// Clear chat
+window.clearChat = function() {
+  const chatMessages = document.getElementById('chat-messages');
+  const container = document.querySelector('.chat-container-main');
+  const suggestions = document.getElementById('initial-suggestions');
+  if (chatMessages) chatMessages.innerHTML = '';
+  if (container) container.classList.remove('has-messages');
+  if (suggestions) suggestions.style.display = '';
+  currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('janmat_session_id', currentSessionId);
+  hideScrollToBottom();
 };
 
 // Copy to clipboard utility
@@ -568,6 +651,19 @@ document.addEventListener('DOMContentLoaded', () => {
       item.classList.add('active');
     });
   });
+
+  // Scroll-to-bottom FAB: show when user scrolls up in chat
+  const chatMsgs = document.getElementById('chat-messages');
+  if (chatMsgs) {
+    chatMsgs.addEventListener('scroll', () => {
+      const distFromBottom = chatMsgs.scrollHeight - chatMsgs.scrollTop - chatMsgs.clientHeight;
+      if (distFromBottom > 80) showScrollToBottom();
+      else hideScrollToBottom();
+    });
+  }
+
+  // Expose hideScrollToBottom globally for inline onclick in HTML
+  window.hideScrollToBottom = hideScrollToBottom;
 });
 
 function updateLocationContext(type) {

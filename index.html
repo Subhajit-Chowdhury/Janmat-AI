@@ -58,6 +58,7 @@
           <a href="#chat">Chat</a>
           <a href="#process">Voter Journey</a>
           <a href="#faqs">FAQs</a>
+          <button class="nav-clear-btn" onclick="clearChat()" title="Start a new conversation">🗑️ New Chat</button>
         </nav>
       </header>
 
@@ -138,6 +139,11 @@
           </div>
         </div>
       </main>
+
+      <!-- Scroll to Bottom FAB -->
+      <button id="scroll-bottom-btn" class="scroll-bottom-fab" onclick="document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight; window.hideScrollToBottom && window.hideScrollToBottom()" title="Scroll to latest">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </button>
 
       <!-- Voter Journey Timeline -->
       <section id="process" class="process-section glass-container">
