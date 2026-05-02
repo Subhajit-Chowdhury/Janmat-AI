@@ -757,12 +757,10 @@
   transform: rotate(0deg);
 }
 
-/* AI Studio Magic Glow on focus */
+/* Smooth focus state without stopping the magic-glow animation */
 .input-container-floating:focus-within {
-  border-color: transparent !important;
-  background: linear-gradient(rgba(38, 38, 38, 0.9), rgba(38, 38, 38, 0.9)) padding-box,
-              linear-gradient(45deg, #FF9933, #ffffff, #138808) border-box !important;
-  box-shadow: 0 0 25px rgba(255, 153, 51, 0.15);
+  box-shadow: 0 0 35px rgba(255, 153, 51, 0.2);
+  transform: translateY(-2px);
 }
 
 /* ═══════════════════════════════════════
