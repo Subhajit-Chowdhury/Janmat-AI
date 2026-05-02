@@ -311,7 +311,7 @@ async function sendMessage(manualText = null) {
     const aiDiv = document.createElement('div');
     aiDiv.className = 'message ai fade-in markdown-body';
 
-    let html = `<div class="ai-avatar">₹</div><div class="ai-text">`;
+    let html = `<div class="ai-avatar">AI</div><div class="ai-text">`;
 
     // Thinking Toggle
     if (thinking) {
