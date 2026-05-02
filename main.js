@@ -401,11 +401,13 @@ async function sendMessage(manualText = null) {
     if (thinking) {
       const thinkId = `think-${Date.now()}`;
       html += `
-        <div class="thinking-toggle" onclick="document.getElementById('${thinkId}').classList.toggle('open')">
-          <span>🧠</span> Model Reasoning <span class="think-chevron">▾</span>
-        </div>
-        <div class="thinking-panel" id="${thinkId}">
-          <p>${thinking}</p>
+        <div class="thinking-wrapper">
+          <button class="thinking-pill" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.think-chevron').classList.toggle('rotated')">
+            <span class="think-icon">🧠</span> Model Reasoning <span class="think-chevron">▾</span>
+          </button>
+          <div class="thinking-panel" id="${thinkId}">
+            <p>${thinking}</p>
+          </div>
         </div>`;
     }
 
@@ -432,11 +434,16 @@ async function sendMessage(manualText = null) {
       html += `<div class="format-warning"><small>⚠️ Response format may be incomplete</small></div>`;
     }
 
-    // Action Bar (copy + timestamp)
+    // Action Bar (copy + listen + timestamp)
     html += `
       <div class="msg-action-bar">
-        <span class="msg-timestamp">${timestamp}</span>
-        <button class="copy-msg-btn" onclick="copyMessageText('${msgId}')" title="Copy response">📋 Copy</button>
+        <div class="action-left">
+          <span class="msg-timestamp">${timestamp}</span>
+        </div>
+        <div class="action-right">
+          <button class="action-msg-btn listen-btn" onclick="speakMessage('${msgId}')" title="Listen to response">🔊 Listen</button>
+          <button class="action-msg-btn copy-msg-btn" onclick="copyMessageText('${msgId}')" title="Copy response">📋 Copy</button>
+        </div>
       </div>`;
 
     html += `</div></div>`;
@@ -503,28 +510,32 @@ window.handleFeedback = (btn) => {
   }, 2000);
 };
 
-// Copy AI message text
-window.copyMessageText = function(msgId) {
+// Text to Speech
+let currentUtterance = null;
+window.speakMessage = function(msgId) {
   const msgEl = document.getElementById(msgId);
   if (!msgEl) return;
-  const answerEl = msgEl.querySelector('.ai-answer');
-  const text = answerEl ? answerEl.innerText : msgEl.innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = msgEl.querySelector('.copy-msg-btn');
-    if (btn) {
-      const orig = btn.textContent;
-      btn.textContent = '✅ Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  
+  const text = msgEl.querySelector('.ai-answer').innerText;
+  
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    if (currentUtterance && currentUtterance.msgId === msgId) {
+      currentUtterance = null;
+      return;
     }
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-  });
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.msgId = msgId;
+  
+  // Basic language detection for TTS
+  if (/[अ-ह]/.test(text)) utterance.lang = 'hi-IN';
+  else if (/[অ-হ]/.test(text)) utterance.lang = 'bn-IN';
+  else utterance.lang = 'en-IN';
+
+  window.speechSynthesis.speak(utterance);
+  currentUtterance = utterance;
 };
 
 // Clear chat
@@ -540,19 +551,21 @@ window.clearChat = function() {
   hideScrollToBottom();
 };
 
-// Copy to clipboard utility
-window.copyToClipboard = function(text) {
+// Copy AI message text
+window.copyMessageText = function(msgId) {
+  const msgEl = document.getElementById(msgId);
+  if (!msgEl) return;
+  const answerEl = msgEl.querySelector('.ai-answer');
+  const text = answerEl ? answerEl.innerText : msgEl.innerText;
   navigator.clipboard.writeText(text).then(() => {
-    // Show brief feedback
-    const btn = event.target.closest('.copy-url-btn');
+    const btn = msgEl.querySelector('.copy-msg-btn');
     if (btn) {
-      const original = btn.textContent;
-      btn.textContent = '✓ Copied!';
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied!';
       btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
     }
   }).catch(() => {
-    // Fallback
     const ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);

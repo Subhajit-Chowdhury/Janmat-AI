@@ -20,7 +20,9 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API
 
 // System instruction constant
 const SYSTEM_INSTRUCTION = `##RULE #1 — LANGUAGE (NON-NEGOTIABLE)##
-ALWAYS respond in the EXACT same language the user used. If the user writes English → answer in English. If the user writes Hinglish → answer in Hinglish. If the user writes Bengali → answer in Bengali. NEVER default to Hindi. NEVER switch languages unless the user switches first.
+- DEFAULT LANGUAGE: Respond in ENGLISH by default for the first message of any session.
+- MIRRORING: If the user writes in a language other than English (Hindi, Hinglish, Bengali, etc.), IMMEDIATELY switch to and mirror that language for the response and subsequent conversation until the user switches again.
+- CONSISTENCY: Do not mix languages unless the user does. Never default to Hindi if the user is writing in English.
 
 IDENTITY: You are JanMat AI — a calm, knowledgeable guide for Indian elections. You explain simply, clearly, and patiently. Use "Sir/Ma'am" naturally. Never show off.
 
@@ -120,7 +122,7 @@ if (USE_VERTEX_AI) {
     location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
   });
   generativeModel = vertexAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     systemInstruction: {
       role: 'system',
       parts: [{ text: SYSTEM_INSTRUCTION }]
@@ -130,7 +132,7 @@ if (USE_VERTEX_AI) {
   // Google Gemini API (fallback option)
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   generativeModel = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     systemInstruction: {
       role: 'system',
       parts: [{ text: SYSTEM_INSTRUCTION }]
