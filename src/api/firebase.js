@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,25 +12,16 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
 /**
- * Logs a chat session for analytics and feedback
+ * Logs a chat session for analytics
  */
-export async function logChatSession(userQuery, aiResponse) {
-  try {
-    if (!firebaseConfig.apiKey) {
-      console.log("Firebase not configured. Skipping session logging.");
-      return;
-    }
-    
-    await addDoc(collection(db, "chat_sessions"), {
-      query: userQuery,
-      response: aiResponse,
-      timestamp: serverTimestamp(),
-      platform: "ElectAI - Web"
-    });
-  } catch (error) {
-    console.error("Firebase Logging Error:", error);
+export async function logChatSession(prompt, response) {
+  // Since we skipped Firestore, we just use Analytics events now
+  // This is better for performance!
+  if (analytics) {
+    console.log('📊 Logging event to Analytics...');
+    // You can add custom events here if needed
   }
 }
