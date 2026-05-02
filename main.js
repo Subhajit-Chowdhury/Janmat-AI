@@ -502,11 +502,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.marked) {
     const renderer = new window.marked.Renderer();
     renderer.link = (href, title, text) => {
-      const displayUrl = href.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      // Ensure href is a string to avoid "href.replace is not a function" errors
+      const hrefStr = String(href || '');
+      const displayUrl = hrefStr.replace(/^https?:\/\//, '').replace(/\/$/, '');
       return `<span class="link-with-copy">
-        <a href="${href}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${title || href}">${text} ↗</a>
+        <a href="${hrefStr}" target="_blank" rel="noopener noreferrer" class="ai-link" title="${title || hrefStr}">${text} ↗</a>
         <span class="link-url-display">${displayUrl}</span>
-        <button class="copy-url-btn" onclick="copyToClipboard('${href}')" title="Copy link">📋 Copy</button>
+        <button class="copy-url-btn" onclick="copyToClipboard('${hrefStr}')" title="Copy link">📋 Copy</button>
       </span>`;
     };
     window.marked.use({ renderer });
