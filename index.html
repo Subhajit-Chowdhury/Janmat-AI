@@ -64,7 +64,8 @@
       <main id="home" class="hero-section">
         <div class="chat-container-main fade-in">
           <div class="chat-welcome" id="chat-welcome">
-            <h1 class="welcome-title">What can I help with?</h1>
+            <h1 class="welcome-title" id="dynamic-greeting">What can I help with?</h1>
+            <p class="welcome-subtitle" id="dynamic-subtitle">Your trusted AI guide for Indian elections — ask in any language 🇮🇳</p>
           </div>
 
           <div class="primary-chat" id="chat">
@@ -73,9 +74,9 @@
             </div>
             
             <div class="ai-input-wrapper">
-              <div class="input-container-floating">
+              <div class="input-container-floating" id="input-pill">
                 <div class="input-actions-left">
-                  <button id="mic-btn" class="action-btn mic-btn" aria-label="Voice Input">
+                  <button id="mic-btn" class="action-btn mic-btn" aria-label="Voice Input" title="Speak your question">
                     <svg viewBox="0 0 24 24" width="20" height="20">
                       <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
                       <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
@@ -85,8 +86,8 @@
                 <textarea id="user-input" placeholder="Ask anything about Indian elections..." rows="1"></textarea>
                 <div class="input-actions-right">
                   <button id="send-msg" class="send-btn-minimal" aria-label="Send Message">
-                    <svg viewBox="0 0 24 24" width="24" height="24">
-                      <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <path fill="currentColor" d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z"></path>
                     </svg>
                   </button>
                 </div>
@@ -97,27 +98,34 @@
                   <span class="card-icon">🗳️</span>
                   <div class="card-text">
                     <strong>Register to Vote</strong>
-                    <p>New voter guide</p>
+                    <p>Step-by-step guide</p>
                   </div>
                 </button>
-                <button class="suggestion-card" onclick="askChip('What is Form 6?')">
-                  <span class="card-icon">📄</span>
+                <button class="suggestion-card" onclick="askChip('What is Form 6 and how to fill it?')">
+                  <span class="card-icon">📋</span>
                   <div class="card-text">
                     <strong>Form 6 Guide</strong>
-                    <p>New application</p>
+                    <p>New voter application</p>
                   </div>
                 </button>
                 <button class="suggestion-card" onclick="askChip('How to find my polling booth?')">
                   <span class="card-icon">📍</span>
                   <div class="card-text">
-                    <strong>Find Booth</strong>
-                    <p>Locate station</p>
+                    <strong>Find My Booth</strong>
+                    <p>Locate polling station</p>
+                  </div>
+                </button>
+                <button class="suggestion-card" onclick="askChip('What valid IDs can I use to vote?')">
+                  <span class="card-icon">🪪</span>
+                  <div class="card-text">
+                    <strong>Valid IDs to Vote</strong>
+                    <p>12 accepted documents</p>
                   </div>
                 </button>
               </div>
 
               <div class="input-footer-minimal">
-                <span>Verified ECI Information & Bharat Election Guide</span>
+                <span>Verified by Election Commission of India · Ask in Hindi, Bengali, Tamil or any language</span>
               </div>
             </div>
           </div>
