@@ -217,12 +217,17 @@
 
 /* ── SUGGESTION CARDS ── */
 .welcome-suggestions-row {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   margin-top: 16px;
-  flex-wrap: wrap;
   padding: 0 4px;
+}
+
+@media (max-width: 600px) {
+  .welcome-suggestions-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .suggestion-card {
