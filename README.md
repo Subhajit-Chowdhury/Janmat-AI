@@ -5,6 +5,22 @@
 
 ---
 
+## 📸 Preview
+
+> _A glimpse of ElectAI in action — smart greetings, multilingual input, and contextual suggestion chips._
+
+![ElectAI Preview](./docs/screenshot.png)
+
+| Feature | Showcase |
+|---|---|
+| 🎨 **Tricolor Gradient UI** | Saffron → White → Green theme |
+| 💬 **Smart Greeting** | Time-aware, personalized messages |
+| 🌐 **Multilingual Input** | 22 official Indian languages |
+| ⚡ **Suggestion Chips** | Context-aware quick actions |
+| 🏛️ **ECI Verified** | Grounded in official election data |
+
+---
+
 ## 🎯 Chosen Vertical
 **Vertical 2: Election Process Education**
 Elect AI focuses on transforming the bureaucratic complexity of the Indian electoral system into a conversational journey. It addresses the diverse linguistic landscape of India, ensuring that every citizen—regardless of their primary language or digital literacy—can understand their rights and the voting process.
