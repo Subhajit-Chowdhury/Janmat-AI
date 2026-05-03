@@ -95,7 +95,9 @@
   font-weight: 800;
   background: linear-gradient(135deg, #FF9933, #ffffff, #138808);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
   letter-spacing: -0.8px;
   line-height: 1.15;
   margin: 0 0 0.2rem;
