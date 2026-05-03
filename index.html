@@ -62,6 +62,10 @@
           </div>
           
           <div class="ai-input-wrapper">
+            <div class="welcome-suggestions-row" id="dynamic-suggestions-container">
+              <!-- Dynamically injected by main.js -->
+            </div>
+
             <div class="input-container-floating" id="input-pill">
               <div class="input-actions-left">
                 <button id="new-chat-plus" class="action-btn plus-btn" onclick="clearChat()" title="New Chat" aria-label="New Chat">
@@ -85,54 +89,9 @@
                 </button>
               </div>
             </div>
-            
-            <div class="welcome-suggestions-row" id="initial-suggestions">
-              <button class="suggestion-card" onclick="askChip('Explain the complete Indian election process step by step')">
-                <span class="card-icon">🏛️</span>
-                <div class="card-text">
-                  <strong>How Elections Work</strong>
-                  <p>Complete process explained</p>
-                </div>
-              </button>
-              <button class="suggestion-card" onclick="askChip('What is the timeline of a General Election in India from announcement to result?')">
-                <span class="card-icon">🗓️</span>
-                <div class="card-text">
-                  <strong>Election Timeline</strong>
-                  <p>Announcement to result</p>
-                </div>
-              </button>
-              <button class="suggestion-card" onclick="askChip('How do I register to vote?')">
-                <span class="card-icon">🗳️</span>
-                <div class="card-text">
-                  <strong>Register to Vote</strong>
-                  <p>Step-by-step guide</p>
-                </div>
-              </button>
-              <button class="suggestion-card" onclick="askChip('What is Form 6 and how to fill it?')">
-                <span class="card-icon">📋</span>
-                <div class="card-text">
-                  <strong>Form 6 Guide</strong>
-                  <p>New voter application</p>
-                </div>
-              </button>
-              <button class="suggestion-card" onclick="askChip('How to find my polling booth?')">
-                <span class="card-icon">📍</span>
-                <div class="card-text">
-                  <strong>Find My Booth</strong>
-                  <p>Locate polling station</p>
-                </div>
-              </button>
-              <button class="suggestion-card" onclick="askChip('What valid IDs can I use to vote?')">
-                <span class="card-icon">🪪</span>
-                <div class="card-text">
-                  <strong>Valid IDs to Vote</strong>
-                  <p>12 accepted documents</p>
-                </div>
-              </button>
-            </div>
 
             <div class="input-footer-minimal">
-              <span>Verified by Election Commission of India · Ask in Hindi, Bengali, Tamil or any language</span>
+              <span>Verified by Election Commission of India · Ask in any language</span>
             </div>
           </div>
         </div>
@@ -149,7 +108,7 @@
 
       <footer class="footer">
         <div class="footer-content">
-          <p>© 2026 ElectAI — Built with Google Gemini for Bharat's Democracy</p>
+          <p>Built with ❤️ by <strong>Subhajit</strong> for <strong>H2S Virtual: PromptWars Challenge 2</strong> | Election Process Education</p>
         </div>
       </footer>
     </div>

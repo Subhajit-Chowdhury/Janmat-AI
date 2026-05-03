@@ -151,6 +151,17 @@ const FOLLOW_UP_MAP = [
   },
 ];
 
+const INITIAL_SUGGESTIONS = [
+  { icon: '🏛️', label: 'How Elections Work', sub: 'Complete process', q: 'Explain the complete Indian election process step by step' },
+  { icon: '🗓️', label: 'Election Timeline', sub: 'Key dates & phases', q: 'What is the timeline of a General Election in India from announcement to result?' },
+  { icon: '🗳️', label: 'Register to Vote', sub: 'New voter guide', q: 'How do I register to vote?' },
+  { icon: '📋', label: 'Form 6 Guide', sub: 'New application', q: 'What is Form 6 and how to fill it?' },
+  { icon: '📍', label: 'Find My Booth', sub: 'Locate station', q: 'How to find my polling booth?' },
+  { icon: '🪪', label: 'Valid IDs to Vote', sub: 'Accepted docs', q: 'What valid IDs can I use to vote?' },
+  { icon: '📱', label: 'Digital Voter ID', sub: 'e-EPIC download', q: 'How do I download my e-EPIC digital Voter ID?' },
+  { icon: '🔍', label: 'Check My Name', sub: 'Voter list search', q: 'How do I check if my name is in the electoral roll?' },
+];
+
 function getFollowUpChips(query) {
   const q = query.toLowerCase();
   let bestMatch = null;
@@ -516,7 +527,10 @@ async function sendMessage(manualText = null) {
   // Hide welcome screen on first message
   if (chatContainer && !chatContainer.classList.contains('has-messages')) {
     chatContainer.classList.add('has-messages');
-    document.getElementById('initial-suggestions').style.display = 'none';
+    const homeEl = document.getElementById('home');
+    if (homeEl) homeEl.classList.add('has-messages');
+    const suggestionsContainer = document.getElementById('dynamic-suggestions-container');
+    if (suggestionsContainer) suggestionsContainer.style.display = 'none';
   }
 
   if (!manualText) {
@@ -796,10 +810,15 @@ window.stopTTS = function() {
 window.clearChat = function() {
   const chatMessages = document.getElementById('chat-messages');
   const container = document.querySelector('.chat-container-main');
-  const suggestions = document.getElementById('initial-suggestions');
+  const suggestions = document.getElementById('dynamic-suggestions-container');
   if (chatMessages) chatMessages.innerHTML = '';
   if (container) container.classList.remove('has-messages');
-  if (suggestions) suggestions.style.display = '';
+  const homeEl = document.getElementById('home');
+  if (homeEl) homeEl.classList.remove('has-messages');
+  if (suggestions) {
+    suggestions.style.display = 'grid';
+    setDynamicSuggestions(); 
+  }
   currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   localStorage.setItem('electai_session_id', currentSessionId);
   hideScrollToBottom();
@@ -899,6 +918,24 @@ function getDynamicGreeting() {
   ]);
 }
 
+function setDynamicSuggestions() {
+  const container = document.getElementById('dynamic-suggestions-container');
+  if (!container) return;
+
+  const shuffled = [...INITIAL_SUGGESTIONS].sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, 2);
+
+  container.innerHTML = selected.map(s => `
+    <button class="suggestion-card" onclick="askChip('${s.q.replace(/'/g, "\\'")}')">
+      <span class="card-icon">${s.icon}</span>
+      <div class="card-text">
+        <strong>${s.label}</strong>
+        <p>${s.sub}</p>
+      </div>
+    </button>
+  `).join('');
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('ElectAI Initialized');
@@ -909,6 +946,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const subEl = document.getElementById('dynamic-subtitle');
   if (greetEl) greetEl.textContent = greeting.title;
   if (subEl) subEl.textContent = greeting.sub;
+
+  // Set dynamic suggestions (2 random ones)
+  setDynamicSuggestions();
 
   if (window.marked) {
     const renderer = new window.marked.Renderer();

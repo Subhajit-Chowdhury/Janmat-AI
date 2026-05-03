@@ -123,12 +123,16 @@ Delhi SIR 2025: ceodelhi.gov.in
 // PROVIDER CONFIGURATION
 // ─────────────────────────────────────────────
 
-// AI Studio keys — supports up to 3 for round-robin quota sharing
-const AI_STUDIO_KEYS = [
-  process.env.GEMINI_API_KEY_1 || process.env.GEMINI_API_KEY,
-  process.env.GEMINI_API_KEY_2,
-  process.env.GEMINI_API_KEY_3,
-].filter(Boolean); // Remove undefined/empty entries
+// AI Studio keys — Dynamically loads ALL keys named GEMINI_API_KEY_1, _2, _3, etc.
+const AI_STUDIO_KEYS = Object.keys(process.env)
+  .filter(key => key.startsWith('GEMINI_API_KEY_'))
+  .map(key => process.env[key])
+  .filter(Boolean);
+
+// Add legacy fallback if no numbered keys exist
+if (AI_STUDIO_KEYS.length === 0 && process.env.GEMINI_API_KEY) {
+  AI_STUDIO_KEYS.push(process.env.GEMINI_API_KEY);
+}
 
 // Vertex AI config (optional fallback — uses GCP ADC, no API key needed)
 const VERTEX_PROJECT_ID = process.env.VERTEX_PROJECT_ID;
@@ -136,10 +140,12 @@ const VERTEX_LOCATION   = process.env.VERTEX_LOCATION || 'us-central1';
 
 // Model cascade list — tried in order on 404/model errors
 const MODEL_CASCADE = [
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-1.5-flash-latest',
-  'gemini-1.0-pro',
+  'gemini-2.0-flash-exp',    // Latest 2.0 (experimental)
+  'gemini-1.5-flash-002',    // Specific stable 1.5
+  'gemini-1.5-flash-001',    // Specific stable 1.5
+  'gemini-1.5-flash',        // Generic 1.5
+  'gemini-1.5-flash-latest', // Latest 1.5
+  'gemini-1.0-pro',          // Fallback 1.0
 ];
 
 // ─────────────────────────────────────────────
@@ -296,7 +302,8 @@ class ProviderRouter {
     for (let mi = 0; mi < MODEL_CASCADE.length; mi++) {
       const modelName = MODEL_CASCADE[mi];
       try {
-        const generativeModel = this.vertexClient.preview.getGenerativeModel({
+        // Use standard getGenerativeModel (removed .preview for stability)
+        const generativeModel = this.vertexClient.getGenerativeModel({
           model: modelName,
           generation_config: { max_output_tokens: 2048, temperature: 0.7 },
         });
@@ -318,12 +325,10 @@ class ProviderRouter {
         return text;
 
       } catch (err) {
-        const isModelError = (err.message || '').includes('404') || (err.message || '').includes('not found');
-        if (isModelError) {
-          console.warn(`⚠️  Vertex model "${modelName}" not found — trying next`);
-          continue;
+        console.warn(`❌ Vertex model "${modelName}" failed:`, err.message);
+        if (err.message.includes('404') || err.message.includes('not found')) {
+          continue; // Try next model in cascade
         }
-        console.error(`❌ Vertex AI error (${modelName}):`, err.message);
         this._markFailed('vertex');
         return null;
       }
@@ -333,14 +338,27 @@ class ProviderRouter {
     return null;
   }
 
-  // ── Main send method: AI Studio → Vertex → error ──
+  // ── Main send method: AI Studio (w/ retry) → Vertex → error ──
   async sendMessage(history, prompt) {
-    // 1. Try AI Studio
-    let response = await this._tryAiStudio(history, prompt);
-    if (response) return response;
+    // 1. Try AI Studio (with retries across ALL available keys if quota is hit)
+    const maxRetries = Math.max(AI_STUDIO_KEYS.length, 3);
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this._tryAiStudio(history, prompt);
+        if (response) return response;
+        
+        // If _tryAiStudio returned null, it means it hit a quota/server error 
+        // and wants us to try the next key or provider.
+        console.log(`🔄 Retrying with next key (Attempt ${attempt + 1}/${maxRetries})...`);
+      } catch (err) {
+        // If it's a fatal error (not quota), we stop and move to Vertex
+        console.error('❌ AI Studio fatal error:', err.message);
+        break;
+      }
+    }
 
     // 2. Try Vertex AI fallback
-    response = await this._tryVertex(history, prompt);
+    const response = await this._tryVertex(history, prompt);
     if (response) return response;
 
     // 3. Both failed
@@ -483,10 +501,22 @@ app.post('/api/chat', async (req, res) => {
 // ─────────────────────────────────────────────
 // STATIC FILES + SPA FALLBACK
 // ─────────────────────────────────────────────
-app.use(express.static(path.join(__dirname, 'dist')));
+const distPath = path.join(__dirname, 'dist');
+const indexPath = path.join(distPath, 'index.html');
+
+app.use(express.static(distPath));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  // Only try to serve index.html if it exists (avoids crash in dev mode)
+  if (req.accepts('html') && !req.url.startsWith('/api')) {
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        res.status(404).send('Frontend not built yet. Run "npm run build" for production serving, or use the Vite dev server (port 5173) for testing.');
+      }
+    });
+  } else {
+    res.status(404).json({ error: 'Not found' });
+  }
 });
 
 // ─────────────────────────────────────────────
