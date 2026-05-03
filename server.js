@@ -37,8 +37,8 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   
-  // Content Security Policy (CSP)
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.googleapis.com;");
+  // Content Security Policy (CSP) — allows Web Speech API + Google Fonts + marked.js CDN
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.google.com wss://*.google.com; media-src 'self';");
 
   const allowedOrigins = ['http://localhost:5173', 'http://localhost:8080', process.env.ALLOWED_ORIGIN].filter(Boolean);
   const origin = req.headers.origin;

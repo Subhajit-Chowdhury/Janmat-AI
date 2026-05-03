@@ -876,7 +876,7 @@ window.clearChat = function() {
   const homeEl = document.getElementById('home');
   if (homeEl) homeEl.classList.remove('has-messages');
   if (suggestions) {
-    suggestions.style.display = 'grid';
+    suggestions.style.display = 'flex';
     setDynamicSuggestions(); 
   }
   currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
