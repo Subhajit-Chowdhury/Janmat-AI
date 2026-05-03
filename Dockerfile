@@ -12,8 +12,5 @@ COPY dist ./dist
 # Copy backend server
 COPY server.js ./
 
-# Clean up
-RUN rm -rf package*.json
-
 EXPOSE 8080
 CMD ["node", "server.js"]
