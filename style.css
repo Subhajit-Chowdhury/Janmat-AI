@@ -59,10 +59,9 @@ body::after {
 }
 
 #app {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 /* Navbar */
@@ -133,10 +132,12 @@ nav a:hover {
 .hero-section {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0;   /* Reset — ui.css controls padding */
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 80px);
 }
 
 .chat-container-main {

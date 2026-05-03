@@ -11,21 +11,17 @@
 #app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   background: #0a0a0a;
 }
 
 /* 2. Main fills all space between header and footer */
 #home.hero-section {
-  flex: 1 1 0;
-  min-height: 0;
+  flex: 1;
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
   padding: 0 !important;
-  overflow: hidden !important;
 }
 
 /* 3. Chat container scrolls as a whole unit */
