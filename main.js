@@ -529,6 +529,12 @@ document.head.appendChild(_micStyle);
 document.addEventListener('DOMContentLoaded', () => {
   const micBtn = document.getElementById('mic-btn');
   if (micBtn) micBtn.addEventListener('click', startRecording);
+
+  const chatMessages = document.getElementById('chat-messages');
+  if (chatMessages) {
+    chatMessages.setAttribute('aria-live', 'polite');
+    chatMessages.setAttribute('role', 'log');
+  }
 });
 
 // Main send message function
@@ -573,7 +579,10 @@ async function sendMessage(manualText = null) {
   lastUserMessage = text;
 
   const sendBtn = document.getElementById('send-msg');
-  if (sendBtn) sendBtn.disabled = true;
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.setAttribute('aria-label', 'Sending message...');
+  }
 
   // User message bubble
   const userDiv = document.createElement('div');
@@ -692,7 +701,13 @@ async function sendMessage(manualText = null) {
     logChatSession(text, answer);
     isRequestInFlight = false;
 
-    if (sendBtn) sendBtn.disabled = false;
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.setAttribute('aria-label', 'Send message');
+    }
+    
+    // Accessibility: Refocus the input for next message
+    if (input) input.focus();
     
     // Refresh suggestions based on the last query
     setDynamicSuggestions(text);
@@ -701,7 +716,12 @@ async function sendMessage(manualText = null) {
     console.error('Chat Error:', error);
     showError(error.message || 'Something went wrong. Please try again.');
     isRequestInFlight = false;
-    if (sendBtn) sendBtn.disabled = false;
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.setAttribute('aria-label', 'Send message');
+    }
+    const input = document.getElementById('user-input');
+    if (input) input.focus();
   }
 }
 
