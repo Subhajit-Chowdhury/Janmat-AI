@@ -895,9 +895,9 @@ function getDynamicGreeting() {
 
   if (hour < 5) return pick([
     { title: 'Still up? Democracy never sleeps, and neither do you 🌙', sub: 'Your curiosity about elections at this hour is exactly what civic India needs.' },
-    { title: 'Midnight scholar. Election champion. 🌙', sub: 'Most people are asleep. You\'re learning how democracy works. Respect.' },
+    { title: 'Midnight scholar. Election champion. 🦉', sub: 'Most people are asleep. You\'re learning how democracy works. Respect.' },
     { title: 'The polls open at dawn. You\'re already prepared 🕯️', sub: 'Asking election questions at this hour? That\'s dedication India deserves.' },
-    { title: '2 AM and still curious about your rights? 🌟', sub: 'That\'s not insomnia. That\'s civic spirit. Let\'s make it count.' },
+    { title: '2 AM and still curious about your rights? ⚡', sub: 'That\'s not insomnia. That\'s civic spirit. Let\'s make it count.' },
   ]);
 
   if (hour < 9) return pick([
@@ -909,50 +909,50 @@ function getDynamicGreeting() {
 
   if (hour < 12) return pick([
     { title: 'Good Morning! Your vote is your voice 🗳️', sub: 'Ask me anything about Indian elections — in Hindi, English, or any language.' },
-    { title: 'Morning momentum — let\'s talk elections 🔆', sub: 'Form 6, polling booths, voter ID — I know it all. What do you want to know?' },
-    { title: 'You showed up. That already makes you different 🌟', sub: 'Most people never ask. You\'re here. Let\'s make this count.' },
+    { title: 'Morning momentum — let\'s talk elections 📜', sub: 'Form 6, polling booths, voter ID — I know it all. What do you want to know?' },
+    { title: 'You showed up. That already makes you different ✊', sub: 'Most people never ask. You\'re here. Let\'s make this count.' },
     { title: 'Good morning! Informed citizens make stronger democracies 🏛️', sub: 'I\'m here to answer every election question you\'ve ever had.' },
   ]);
 
   if (hour < 14) return pick([
-    { title: 'Midday check-in — what\'s on your mind? 💡', sub: 'From Form 6 to polling booths, I\'ve got all your election questions covered.' },
+    { title: 'Midday check-in — what\'s on your mind? 💬', sub: 'From Form 6 to polling booths, I\'ve got all your election questions covered.' },
     { title: 'Lunch break wisdom 🍱', sub: 'Five minutes with ElectAI could answer questions you\'ve had for years.' },
     { title: 'Peak hours, peak curiosity 🔥', sub: 'Democracy runs all day. So do I. Ask away.' },
-    { title: 'You\'re thinking about elections over lunch? 🏅', sub: 'That\'s not common. And that\'s exactly what makes it powerful.' },
+    { title: 'You\'re thinking about elections over lunch? 🦁', sub: 'That\'s not common. And that\'s exactly what makes it powerful.' },
   ]);
 
   if (hour < 17) return pick([
-    { title: 'Good Afternoon! Ready to learn together? 📚', sub: 'Millions of Indians don\'t know their voter rights. You\'re about to be different.' },
+    { title: 'Good Afternoon! Ready to learn together? 📖', sub: 'Millions of Indians don\'t know their voter rights. You\'re about to be different.' },
     { title: 'Afternoon conversations, democratic foundations 🇮🇳', sub: 'Every informed question you ask makes the next election a little better.' },
     { title: 'Still here, still curious 🌤️', sub: 'Your questions aren\'t just questions. They\'re the foundation of a stronger vote.' },
     { title: 'The booth is yours. Let\'s make sure you\'re ready for it ✅', sub: 'I know election rules, forms, timelines and voter rights — all in one place.' },
   ]);
 
   if (hour < 19) return pick([
-    { title: 'Evening vibes, civic minds 🌅', sub: 'The best time to learn how your vote shapes India\'s future.' },
-    { title: 'Golden hour. Perfect time to understand your vote 🌇', sub: 'The day isn\'t done yet, and neither is your right to know.' },
+    { title: 'Evening vibes, civic minds 🌇', sub: 'The best time to learn how your vote shapes India\'s future.' },
+    { title: 'Golden hour. Perfect time to understand your vote 🌆', sub: 'The day isn\'t done yet, and neither is your right to know.' },
     { title: 'Before dinner, a little democracy? 🍽️', sub: 'Most people scroll. You\'re here learning your rights. That\'s rare.' },
     { title: 'Evening you, curious you, empowered you 💪', sub: 'Elections aren\'t just events — they\'re your moment. I\'ll help you own it.' },
   ]);
 
   if (hour < 21) return pick([
     { title: 'Election questions don\'t have office hours 🌆', sub: 'And neither do I. Ask me anything — I\'m always here.' },
-    { title: 'You came back. I noticed 👀', sub: 'Whether it\'s your first question or your fiftieth — I\'ve got you.' },
-    { title: 'Evening, fellow democracy enthusiast 🙌', sub: 'Your question tonight might be the answer someone else needed tomorrow.' },
+    { title: 'You came back. That\'s civic dedication right there 🔍', sub: 'Whether it\'s your first question or your fiftieth — I\'ve got you.' },
+    { title: 'Evening, fellow democracy enthusiast 🇮🇳', sub: 'Your question tonight might be the answer someone else needed tomorrow.' },
     { title: 'This is your time. This is your vote 🗳️', sub: 'Ask boldly. Democracy rewards the informed.' },
-    { title: 'Here again? Respect. 🌟', sub: 'The more you know about elections, the more powerful your vote becomes.' },
+    { title: 'Here again? Respect. ⚡', sub: 'The more you know about elections, the more powerful your vote becomes.' },
   ]);
 
   if (hour < 23) return pick([
     { title: 'Winding down, but still curious? 🌙', sub: 'One question tonight could make you a more informed voter tomorrow.' },
-    { title: 'Late evening scholar 📖', sub: 'You\'re still here while most have switched off. That matters.' },
+    { title: 'Late evening scholar 📜', sub: 'You\'re still here while most have switched off. That matters.' },
     { title: 'Night mode. Civic mode 🌙', sub: 'The quieter it gets, the clearer your rights become. Ask me.' },
     { title: 'One last question before you rest? 🌛', sub: 'I promise I won\'t judge the hour. Democracy doesn\'t either.' },
   ]);
 
   return pick([
-    { title: 'Late night, deep questions — I respect that 🌟', sub: 'The kind of citizen who learns about elections past midnight? India needs more of you.' },
-    { title: 'Midnight and still thinking about your vote 🏅', sub: 'You\'re probably the most prepared voter in your neighbourhood right now.' },
+    { title: 'Late night, deep questions — I respect that 🌌', sub: 'The kind of citizen who learns about elections past midnight? India needs more of you.' },
+    { title: 'Midnight and still thinking about your vote 🌟', sub: 'You\'re probably the most prepared voter in your neighbourhood right now.' },
     { title: 'The world is asleep. You\'re learning democracy 🌌', sub: 'That\'s not just curiosity. That\'s citizenship at its finest.' },
     { title: 'Even at midnight, your vote matters 🕛', sub: 'Ask your question. I\'ll be here. Always.' },
   ]);
@@ -981,11 +981,22 @@ function setDynamicSuggestions(query = null) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('ElectAI Initialized');
 
-  // Set dynamic greeting
+  // Set dynamic greeting — split emoji from text so gradient doesn't color the emoji
   const greeting = getDynamicGreeting();
   const greetEl = document.getElementById('dynamic-greeting');
   const subEl = document.getElementById('dynamic-subtitle');
-  if (greetEl) greetEl.textContent = greeting.title;
+  if (greetEl) {
+    // Extract trailing emoji(s) from the title
+    const emojiRegex = /([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}\u{1F1E0}-\u{1F1FF}✅🇮🇳🗳️🏛️🕯️🕛🌛⚡✊]+)$/u;
+    const match = greeting.title.match(emojiRegex);
+    if (match) {
+      const textPart = greeting.title.slice(0, match.index).trimEnd();
+      const emojiPart = match[0];
+      greetEl.innerHTML = `<span class="greeting-text">${textPart}</span><span class="greeting-emoji">${emojiPart}</span>`;
+    } else {
+      greetEl.innerHTML = `<span class="greeting-text">${greeting.title}</span>`;
+    }
+  }
   if (subEl) subEl.textContent = greeting.sub;
 
   // Set dynamic suggestions (2 random ones)

@@ -93,16 +93,33 @@
   font-family: var(--font-display, 'Outfit', sans-serif);
   font-size: clamp(1.3rem, 3vw, 2rem);
   font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  margin: 0 0 0.2rem;
+  animation: fadeIn 0.6s ease-out;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  flex-wrap: wrap;
+}
+
+/* Gradient applied ONLY to the text portion — not the emoji */
+.welcome-title .greeting-text {
   background: linear-gradient(135deg, #FF9933, #ffffff, #138808);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  letter-spacing: -0.8px;
-  line-height: 1.15;
-  margin: 0 0 0.2rem;
-  animation: fadeIn 0.6s ease-out;
-  text-align: center;
+}
+
+/* Emoji rendered in its original native colors */
+.welcome-title .greeting-emoji {
+  -webkit-text-fill-color: initial;
+  color: initial;
+  background: none;
+  display: inline-block;
 }
 
 .welcome-subtitle {
