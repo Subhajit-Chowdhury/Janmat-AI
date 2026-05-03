@@ -137,7 +137,7 @@ app.post('/api/chat', rateLimiter, async (req, res) => {
     if (history.length > CONFIG.MAX_HISTORY * 2) history = history.slice(-CONFIG.MAX_HISTORY * 2);
     sessions.set(sessionId, history);
 
-    res.json({ text, thinking: "Generated using Gemini 1.5 Flash" });
+    res.json({ response: text, thinking: "Generated using Gemini 1.5 Flash" });
 
   } catch (error) {
     console.error('Chat Error:', error);

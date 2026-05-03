@@ -142,35 +142,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module" src="/main.js"></script>
-    <script>
-      if (!localStorage.getItem('electai_session_id')) {
-        localStorage.setItem('electai_session_id', 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
-      }
-      const SESSION_ID = localStorage.getItem('electai_session_id');
-
-      window.askElectAI = async function(prompt) {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Session-Id': SESSION_ID },
-          body: JSON.stringify({ prompt }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Network error');
-        return data.response;
-      };
-
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        document.addEventListener('focusin', (e) => {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            document.body.classList.add('keyboard-open');
-          }
-        });
-        document.addEventListener('focusout', (e) => {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            document.body.classList.remove('keyboard-open');
-          }
-        });
-      }
-    </script>
   </body>
 </html>
