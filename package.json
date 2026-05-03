@@ -1,7 +1,9 @@
 {
   "name": "elect-ai",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "AI-powered multilingual civic assistant for Indian election education — built with Google Gemini, Vertex AI, Firebase, and Cloud Run for H2S PromptWars Challenge 2.",
+  "keywords": ["election", "india", "gemini", "vertex-ai", "civic-tech", "multilingual", "firebase", "cloud-run"],
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run backend\" \"vite --host\"",
