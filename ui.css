@@ -502,8 +502,8 @@
   z-index: 200 !important;
   background: rgba(10, 10, 10, 0.88) !important;
   backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-image: none !important;
+  border-bottom: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, #FF9933, rgba(255,255,255,0.2), #138808) 1 !important;
   padding: 0.8rem 2rem !important;
 }
 

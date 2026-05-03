@@ -113,7 +113,7 @@ Delhi SIR 2025: ceodelhi.gov.in
 
 // Initialize AI based on configuration
 let generativeModel;
-const MODEL_NAME = 'gemini-1.5-flash'; // Current stable model
+const MODEL_NAME = 'gemini-1.5-flash-latest'; // High free-tier quota
 
 async function initAI() {
   try {
