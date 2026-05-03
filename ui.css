@@ -19,7 +19,7 @@
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 !important;
+  padding: 2rem 1.5rem !important; /* Added safety padding */
   position: relative !important;
   overflow: hidden !important;
 }

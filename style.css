@@ -69,14 +69,12 @@ body::after {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.2rem 5%;
+  padding: 1rem 5%;
   backdrop-filter: blur(20px);
-  position: sticky;
-  top: 0;
+  position: relative; /* Changed from sticky to follow flex flow */
   z-index: 100;
-  background: rgba(10, 10, 10, 0.7);
-  border-bottom: 2px solid transparent;
-  border-image: linear-gradient(to right, var(--national-saffron), var(--national-white), var(--national-green)) 1;
+  background: rgba(10, 10, 10, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .logo {
