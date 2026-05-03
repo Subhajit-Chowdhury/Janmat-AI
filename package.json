@@ -9,8 +9,8 @@
     "dev": "concurrently --kill-others \"npm run backend\" \"vite --host --clearScreen false\"",
     "backend": "node --watch server.js",
     "start": "node server.js",
-    "build": "vite build",
-    "serve": "npm run build && node server.js",
+    "build": "vite build && node server.js",
+    "serve": "node server.js",
     "test": "vitest",
     "test:coverage": "vitest run --coverage"
   },
