@@ -831,7 +831,7 @@ function setDynamicSuggestions(query = null) {
   const container = document.getElementById('dynamic-suggestions-container');
   if (!container) return;
 
-  const chips = query ? (getFollowUpChips(query) || INITIAL_SUGGESTIONS) : INITIAL_SUGGESTIONS;
+  const chips = query ? (getFollowUpChips(query) || INITIAL_SUGGESTIONS || []) : (INITIAL_SUGGESTIONS || []);
   const shuffled = [...chips].sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 2);
 
@@ -848,7 +848,7 @@ function setDynamicSuggestions(query = null) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('ElectAI Initialized');
+  console.log('🚀 ElectAI Initializing...');
 
   // Set dynamic greeting — split emoji from text so gradient doesn't color the emoji
   const greeting = getDynamicGreeting();
