@@ -20,6 +20,20 @@ import { logChatSession } from './src/api/firebase.js';
 /** @type {NodeJS.Timeout|null} Interval for rotating input placeholders */
 let placeholderInterval = null;
 
+// Global Error Boundary - 100% Resilience Target
+window.addEventListener('error', (event) => {
+  console.error('[Global Error]:', event.error);
+  if (event.error?.message?.includes('Gemini')) {
+    showError('AI Connection reset. Please refresh.');
+  }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[Unhandled Promise]:', event.reason);
+  isRequestInFlight = false;
+  removeSkeletonLoader();
+});
+
 /** @type {number} Current index in the placeholder rotation */
 let currentPlaceholderIndex = 0;
 
