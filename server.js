@@ -234,4 +234,3 @@ app.listen(CONFIG.PORT, () => {
   console.log(`🔒 Environment: ${CONFIG.NODE_ENV}`);
   console.log(`🔑 AI Keys Loaded: ${API_KEYS.length}\n`);
 });
-);
