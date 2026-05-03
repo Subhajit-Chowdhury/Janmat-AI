@@ -59,9 +59,10 @@ body::after {
 }
 
 #app {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* Navbar */
@@ -130,15 +131,12 @@ nav a:hover {
 /* Hero Section */
 /* Redesigned Hero Section */
 .hero-section {
-
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 5% 6rem;
-  background: radial-gradient(circle at 20% 30%, rgba(255, 153, 51, 0.1), transparent 40%),
-              radial-gradient(circle at 80% 70%, rgba(19, 136, 8, 0.1), transparent 40%);
+  padding: 0;   /* Reset — ui.css controls padding */
 }
 
 .chat-container-main {
