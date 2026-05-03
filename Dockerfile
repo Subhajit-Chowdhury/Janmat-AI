@@ -1,19 +1,19 @@
-# Build Stage
-FROM node:20-slim AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
 # Production Stage
 FROM node:20-slim
 WORKDIR /app
+
+# Copy production dependencies
 COPY package*.json ./
 RUN npm ci --only=production
-COPY --from=build /app/dist ./dist
+
+# Copy built frontend assets from local dist
+COPY dist ./dist
+
+# Copy backend server
 COPY server.js ./
-# COPY .env ./ # Removed for security, use Cloud Run environment variables instead
+
+# Clean up
+RUN rm -rf package*.json
 
 EXPOSE 8080
 CMD ["node", "server.js"]
