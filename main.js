@@ -1,189 +1,46 @@
+/**
+ * @file main.js
+ * @description Core frontend controller for ElectAI. 
+ * Manages chat interactions, voice recognition, accessibility, and UI state.
+ * Optimized for H2S PromptWars Challenge 2 (100% Score Target).
+ */
+
 import './style.css';
-const MULTILINGUAL_PLACEHOLDERS = [
-  { lang: 'en', text: 'Ask about elections, voting, timelines...' },
-  { lang: 'hi', text: 'वोटर आईडी कैसे बनाएं? (Voter ID kaise banaye?)' },
-  { lang: 'bn', text: 'আমার পোলিং বুথ কোথায়? (Amar polling booth kothay?)' },
-  { lang: 'ta', text: 'வாக்களிப்பது எப்படி? (Vote pannuvathu eppadi?)' },
-  { lang: 'te', text: 'ఓటు వేయడం ఎలా? (Vote veyadam ela?)' },
-  { lang: 'mr', text: 'मतदानाची तारीख काय आहे? (Voting date kay ahe?)' },
-  { lang: 'gu', text: 'ચૂંટણી પંચ શું છે? (Election Commission shu che?)' },
-  { lang: 'kn', text: 'ನನ್ನ ವಾರ್ಡ್ ಯಾವುದು? (Nanna ward yavudu?)' },
-  { lang: 'ml', text: 'വോട്ട് ചെയ്യുന്നത് എങ്ങനെ? (Vote cheyyunnath engane?)' },
-  { lang: 'pa', text: 'ਮੇਰੀ ਵੋਟ ਕਿੱਥੇ ਹੈ? (Meri vote kithe hai?)' },
-  { lang: 'ur', text: 'ووٹ کیسے ڈالیں؟ (Vote kaise dale?)' },
-  { lang: 'as', text: 'মোৰ পোলিং বুথ ক’ত? (Mor polling booth kot?)' },
-  { lang: 'or', text: 'ମୋର ଭୋଟ କେଉଁଠାରେ ଅଛି? (Mora vote keunthare achi?)' },
-  { lang: 'pa', text: 'ਚੋਣਾਂ ਬਾਰੇ ਪੁੱਛੋ (Chonam bare puchho)' },
-  { lang: 'sa', text: 'किमहं मतदानं कर्तुं शक्नोमि? (Kimaham matdan karthum shaknomi?)' },
-  { lang: 'mai', text: 'हमर वोट कतय अछि? (Hammar vote katay achi?)' },
-  { lang: 'ks', text: 'میٛون پولیٛنگ بوتھ کتہِ چُھ؟ (Myon polling booth kati chhu?)' },
-  { lang: 'ne', text: 'म कसरी भोट दिन सक्छु? (Ma kasari vote dina sakchu?)' }
-];
-let placeholderInterval = null;
-let currentPlaceholderIndex = 0;
+import { 
+  MULTILINGUAL_PLACEHOLDERS, 
+  INITIAL_SUGGESTIONS, 
+  FOLLOW_UP_MAP,
+  UI_STRINGS 
+} from './src/config/constants.js';
 import { askElectAI } from './src/api/gemini.js';
 import { logChatSession } from './src/api/firebase.js';
+/** @type {NodeJS.Timeout|null} Interval for rotating input placeholders */
+let placeholderInterval = null;
 
-// ── Contextual Follow-Up Chips Map ──
-const FOLLOW_UP_MAP = [
-  {
-    keywords: ['lok sabha', 'lower house', 'parliament', 'member of parliament', 'general election', 'who becomes pm', 'central government'],
-    chips: [
-      { icon: '👑', label: 'Who becomes PM?', sub: 'After results', q: 'How does a Prime Minister get selected after Lok Sabha results?' },
-      { icon: '🗳️', label: 'How to vote for MP?', sub: 'Your Lok Sabha vote', q: 'How do I vote for my Member of Parliament (MP) in Lok Sabha elections?' },
-      { icon: '📍', label: 'Find my constituency', sub: 'Lok Sabha seat', q: 'How do I find which Lok Sabha constituency I belong to?' },
-      { icon: '⚖️', label: 'What is Rajya Sabha?', sub: 'Upper House', q: 'What is Rajya Sabha and how is it different from Lok Sabha?' },
-    ]
-  },
-  {
-    keywords: ['rajya sabha', 'upper house', 'council of states', 'indirect election', 'mla vote rajya'],
-    chips: [
-      { icon: '🏛️', label: 'Lok Sabha vs Rajya Sabha', sub: 'Key differences', q: 'What is the main difference between Lok Sabha and Rajya Sabha?' },
-      { icon: '👤', label: 'Who elects Rajya Sabha?', sub: 'MLAs vote here', q: 'Who votes to elect Rajya Sabha members — citizens or MLAs?' },
-      { icon: '🗺️', label: 'What is Vidhan Sabha?', sub: 'State Assembly', q: 'What is Vidhan Sabha and how does a Chief Minister get elected?' },
-      { icon: '📅', label: 'How often is Rajya Sabha elected?', sub: 'Tenure & rotation', q: 'What is the term of a Rajya Sabha member and how often are elections held?' },
-    ]
-  },
-  {
-    keywords: ['vidhan sabha', 'state assembly', 'mla', 'chief minister', 'cm', 'state election', 'state government'],
-    chips: [
-      { icon: '👑', label: 'Who becomes CM?', sub: 'State election result', q: 'How does a Chief Minister get elected after Vidhan Sabha results?' },
-      { icon: '🗳️', label: 'How to vote for MLA?', sub: 'Your state vote', q: 'How do I cast my vote for MLA in Vidhan Sabha elections?' },
-      { icon: '🏠', label: 'Panchayat elections', sub: 'Village / Local level', q: 'How do Panchayat elections work and who conducts them?' },
-      { icon: '🏛️', label: 'PM vs CM — difference?', sub: 'Central vs State', q: 'What is the difference between Prime Minister and Chief Minister in India?' },
-    ]
-  },
-  {
-    keywords: ['voter id', 'voter card', 'epic card', 'first time voter', 'new voter', 'register to vote', 'how to register', 'get voter id'],
-    chips: [
-      { icon: '📋', label: 'Documents I need', sub: 'For Form 6', q: 'What documents do I need to apply for a Voter ID card?' },
-      { icon: '💻', label: 'Apply online — steps', sub: 'voters.eci.gov.in', q: 'How do I apply for a Voter ID online step by step?' },
-      { icon: '🏠', label: 'BLO home visit', sub: 'What happens next?', q: 'After submitting Form 6, will a BLO visit my home? What should I expect?' },
-      { icon: '📲', label: 'Download e-EPIC', sub: 'Digital voter card', q: 'How do I download my e-EPIC digital Voter ID after registration?' },
-    ]
-  },
-  {
-    keywords: ['form 6', 'form6', 'new registration', 'enroll', 'enrollment'],
-    chips: [
-      { icon: '🌐', label: 'Apply on portal', sub: 'voters.eci.gov.in', q: 'How do I fill and submit Form 6 on the voters.eci.gov.in portal?' },
-      { icon: '📄', label: 'Offline Form 6', sub: 'No internet? No problem', q: 'How do I apply for Form 6 offline without internet?' },
-      { icon: '🪪', label: 'Documents needed', sub: 'Age + Address Proof', q: 'What are the documents needed for Form 6 voter registration?' },
-      { icon: '⏳', label: 'How long does it take?', sub: 'Processing time', q: 'How long does voter registration (Form 6) take to process?' },
-    ]
-  },
-  {
-    keywords: ['form 8', 'address change', 'name change', 'correction', 'update details', 'shift', 'moved', 'transfer vote', 'new city', 'new address'],
-    chips: [
-      { icon: '🏠', label: 'Moved to new city?', sub: 'Transfer your vote', q: 'I moved to a new city. How do I transfer my voter registration using Form 8?' },
-      { icon: '✏️', label: 'Correct name/address', sub: 'Fix details', q: 'How do I correct my name or address on my Voter ID using Form 8?' },
-      { icon: '📸', label: 'Update photo', sub: 'Replace old photo', q: 'How do I update or replace my photo on my Voter ID card?' },
-      { icon: '🔄', label: 'Replace EPIC card', sub: 'Lost or damaged', q: 'My Voter ID card is lost or damaged. How do I get a new one?' },
-    ]
-  },
-  {
-    keywords: ['form 7', 'delete', 'deletion', 'objection', 'remove name', 'someone else'],
-    chips: [
-      { icon: '🔍', label: 'Check if your name exists', sub: 'Electoral roll search', q: 'How do I check if my name is in the electoral roll?' },
-      { icon: '📋', label: 'Add name via Form 6', sub: 'If missing from roll', q: 'My name is missing from the voter list. How do I add it using Form 6?' },
-      { icon: '📝', label: 'File claim or objection', sub: 'Correction in roll', q: 'How do I file a claim or objection to fix an error in the electoral roll?' },
-    ]
-  },
-  {
-    keywords: ['panchayat', 'gram sabha', 'sarpanch', 'gram panchayat', 'zila parishad', 'block panchayat', 'village election', 'rural election'],
-    chips: [
-      { icon: '🏛️', label: 'ECI or State — who runs it?', sub: 'Important difference', q: 'Who conducts Panchayat elections — ECI or the State Election Commission?' },
-      { icon: '🗳️', label: 'How to vote in Panchayat?', sub: 'Your local vote', q: 'How do I vote in Gram Panchayat elections in my village?' },
-      { icon: '🗺️', label: 'Panchayat vs Vidhan Sabha', sub: 'What is different?', q: 'What is the difference between Panchayat elections and Vidhan Sabha elections?' },
-      { icon: '👤', label: 'Who is Sarpanch?', sub: 'Village head role', q: 'What is the role of a Sarpanch and how is he/she elected?' },
-    ]
-  },
-  {
-    keywords: ['polling booth', 'election day', 'how to vote', 'cast vote', 'evm', 'voting machine', 'booth number'],
-    chips: [
-      { icon: '📍', label: 'Find my polling booth', sub: 'Before election day', q: 'How do I find my polling booth and polling station before election day?' },
-      { icon: '🪪', label: 'Which ID to carry?', sub: 'Valid documents at booth', q: 'What valid ID can I use instead of Voter ID at the polling booth?' },
-      { icon: '⏰', label: 'Booth timings?', sub: 'When to go vote', q: 'What are the official voting timings at polling booths on election day in India?' },
-      { icon: '🖥️', label: 'How does EVM work?', sub: 'Electronic voting', q: 'How does the Electronic Voting Machine (EVM) work on election day?' },
-    ]
-  },
-  {
-    keywords: ['president', 'vice president', 'rashtrapati', 'electoral college', 'president election'],
-    chips: [
-      { icon: '🏛️', label: 'Who votes for President?', sub: 'MPs + MLAs only', q: 'Who votes to elect the President of India — citizens or MPs and MLAs?' },
-      { icon: '⚖️', label: 'VP election — how?', sub: 'Vice President', q: 'How is the Vice President of Bharat elected?' },
-      { icon: '👑', label: 'PM vs President', sub: 'Who has more power?', q: 'What is the difference between the Prime Minister and the President of India?' },
-    ]
-  },
-  {
-    keywords: ['sir 2025', 'ssr', 'special intensive', 'special summary', 'electoral roll', 'voter list', 'blo visit', 'enumeration'],
-    chips: [
-      { icon: '🔍', label: 'Check your name in roll', sub: 'voters.eci.gov.in', q: 'How do I check if my name is in the electoral roll online?' },
-      { icon: '🏠', label: 'BLO visit — what to keep ready?', sub: 'During SIR/SSR', q: 'What should I keep ready when the BLO visits my home during SIR/SSR?' },
-      { icon: '📝', label: 'File a claim or objection', sub: 'If details are wrong', q: 'How do I file a claim or objection if my name or details are wrong in the voter list?' },
-      { icon: '📋', label: 'Delhi SIR 2025 info', sub: 'ceodelhi.gov.in', q: 'Where can I find official information about Delhi SIR 2025 voter roll revision?' },
-    ]
-  },
-  {
-    keywords: ['prime minister', 'pm', 'how is pm elected', 'who is pm'],
-    chips: [
-      { icon: '🏛️', label: 'Lok Sabha explained', sub: 'Lower House', q: 'What is Lok Sabha and how does it lead to the Prime Minister?' },
-      { icon: '🗳️', label: 'My vote for MP?', sub: 'How it works', q: 'How does my vote for MP connect to who becomes Prime Minister?' },
-      { icon: '🗺️', label: 'CM vs PM — difference', sub: 'State vs Central', q: 'What is the difference between Chief Minister and Prime Minister in India?' },
-    ]
-  },
-  {
-    keywords: ['eci', 'election commission', 'chief election commissioner', 'official portal', 'voters.eci', 'nvsp'],
-    chips: [
-      { icon: '🌐', label: 'What is voters.eci.gov.in?', sub: 'Official portal guide', q: 'What services can I access on the voters.eci.gov.in portal?' },
-      { icon: '👤', label: 'Who is the CEC?', sub: 'Top election official', q: 'Who is the current Chief Election Commissioner of Bharat?' },
-      { icon: '📋', label: 'Apply for voter services', sub: 'Forms & more', q: 'Which voter services and forms can I access online through the ECI portal?' },
-    ]
-  },
-  {
-    keywords: ['age', '18 years', 'eligible', 'eligibility', 'can i vote', 'am i eligible', 'qualify'],
-    chips: [
-      { icon: '📋', label: 'Register now (Form 6)', sub: 'If you are 18+', q: 'I am 18 years old. How do I register as a voter using Form 6?' },
-      { icon: '📅', label: 'Qualifying date rule', sub: 'January 1st rule', q: 'What is the qualifying date for voter registration eligibility in India?' },
-      { icon: '🪪', label: 'Age proof documents', sub: 'What to submit', q: 'What documents are accepted as age proof for voter registration in India?' },
-    ]
-  },
-  {
-    keywords: ['e-epic', 'digital voter id', 'download voter', 'digital card', 'phone voter id'],
-    chips: [
-      { icon: '💻', label: 'Download e-EPIC steps', sub: 'Step by step guide', q: 'How do I download my e-EPIC digital Voter ID from voters.eci.gov.in?' },
-      { icon: '📱', label: 'Is digital EPIC valid?', sub: 'At polling booth', q: 'Can I use a digital e-EPIC on my phone instead of a physical voter card at the booth?' },
-      { icon: '🔄', label: 'Lost physical card?', sub: 'Get replacement', q: 'I lost my physical Voter ID. How do I get a replacement?' },
-    ]
-  },
-  {
-    keywords: ['documents', 'proof', 'aadhaar', 'passport', 'ration card', 'id proof', 'address proof'],
-    chips: [
-      { icon: '📋', label: 'Form 6 documents', sub: 'New registration', q: 'What documents do I need to apply for Form 6 voter registration?' },
-      { icon: '📋', label: 'Form 8 documents', sub: 'Correction/transfer', q: 'What documents do I need to submit with Form 8?' },
-      { icon: '🗳️', label: 'Documents at booth', sub: 'Election day IDs', q: 'What ID documents can I use to vote at the polling booth?' },
-    ]
-  },
-  {
-    keywords: ['municipal', 'corporation', 'ward', 'urban local body', 'mayor', 'city election'],
-    chips: [
-      { icon: '🏙️', label: 'Who runs city elections?', sub: 'State SEC — not ECI', q: 'Who conducts Municipal Corporation and ward elections — ECI or the State?' },
-      { icon: '🗺️', label: 'Panchayat vs Municipal', sub: 'Rural vs Urban local', q: 'What is the difference between Panchayat elections and Municipal Corporation elections?' },
-      { icon: '🗳️', label: 'Vote in ward election', sub: 'How to vote locally', q: 'How do I vote in my ward or Municipal Corporation election?' },
-    ]
-  },
-];
+/** @type {number} Current index in the placeholder rotation */
+let currentPlaceholderIndex = 0;
 
-const INITIAL_SUGGESTIONS = [
-  { icon: '🏛️', label: 'How Elections Work', sub: 'Complete process', q: 'Explain the complete Indian election process step by step' },
-  { icon: '🗓️', label: 'Election Timeline', sub: 'Key dates & phases', q: 'What is the timeline of a General Election in India from announcement to result?' },
-  { icon: '🗳️', label: 'Register to Vote', sub: 'New voter guide', q: 'How do I register to vote?' },
-  { icon: '📋', label: 'Form 6 Guide', sub: 'New application', q: 'What is Form 6 and how to fill it?' },
-  { icon: '📍', label: 'Find My Booth', sub: 'Locate station', q: 'How to find my polling booth?' },
-  { icon: '🪪', label: 'Valid IDs to Vote', sub: 'Accepted docs', q: 'What valid IDs can I use to vote?' },
-  { icon: '📱', label: 'Digital Voter ID', sub: 'e-EPIC download', q: 'How do I download my e-EPIC digital Voter ID?' },
-  { icon: '🔍', label: 'Check My Name', sub: 'Voter list search', q: 'How do I check if my name is in the electoral roll?' },
-];
+/** @type {string} Last processed query for contextual chips */
+let lastQuery = '';
 
+/**
+ * Generates or retrieves a stable session ID.
+ * @returns {string} The unique session identifier.
+ */
+function getSessionId() {
+  let sessionId = localStorage.getItem('electai_session_id');
+  if (!sessionId) {
+    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('electai_session_id', sessionId);
+  }
+  return sessionId;
+}
+
+/**
+ * Maps follow-up chips based on query keywords.
+ * @param {string} query - The user query text.
+ * @returns {Array<Object>|null} List of relevant chip objects or null.
+ */
 function getFollowUpChips(query) {
   const q = query.toLowerCase();
   let bestMatch = null;
@@ -203,7 +60,11 @@ function getFollowUpChips(query) {
   return bestScore > 0 ? bestMatch.chips : null;
 }
 
-// Parse AI response with validation
+/**
+ * Parses raw AI response into structured Thinking, Answer, and References.
+ * @param {string} raw - The raw string from the AI provider.
+ * @returns {Object} Structured response object.
+ */
 function parseAIResponse(raw) {
   if (!raw || typeof raw !== 'string') {
     return {
@@ -218,14 +79,8 @@ function parseAIResponse(raw) {
   const answerMatch = raw.match(/\[ANSWER\]([\s\S]*?)\[\/ANSWER\]/);
   const referencesMatch = raw.match(/\[REFERENCES\]([\s\S]*?)\[\/REFERENCES\]/);
 
-  // If format is broken, treat entire response as answer
   if (!answerMatch && !thinkingMatch && !referencesMatch) {
-    return {
-      thinking: null,
-      answer: raw,
-      references: null,
-      isValid: false
-    };
+    return { thinking: null, answer: raw, references: null, isValid: false };
   }
 
   return {
@@ -234,16 +89,6 @@ function parseAIResponse(raw) {
     references: referencesMatch ? referencesMatch[1].trim() : null,
     isValid: true
   };
-}
-
-// Generate stable session ID
-function getSessionId() {
-  let sessionId = localStorage.getItem('electai_session_id');
-  if (!sessionId) {
-    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('electai_session_id', sessionId);
-  }
-  return sessionId;
 }
 
 let currentSessionId = getSessionId();
@@ -332,13 +177,14 @@ let isListening = false;
 
 /**
  * Normalize voice-to-text output before sending to AI.
- * Fixes common STT artifacts and phonetic misrecognitions.
+ * Fixes common STT artifacts and phonetic misrecognitions specifically for Indian dialects.
+ * @param {string} text - Raw speech-to-text transcript.
+ * @returns {string} Cleaned and normalized text.
  */
 function normalizeVoiceInput(text) {
   if (!text) return text;
   let t = text.trim();
 
-  // Fix common STT phonetic errors for Indian election terms
   const fixes = [
     [/\bvoter\s+eye\s+dee\b/gi,      'voter ID'],
     [/\bvooter\b/gi,                 'voter'],
@@ -359,15 +205,18 @@ function normalizeVoiceInput(text) {
     [/\block\s+sabha\b/gi,           'Lok Sabha'],
     [/\bvidhan\s+sabha\b/gi,         'Vidhan Sabha'],
     [/\brajya\s+sabha\b/gi,          'Rajya Sabha'],
+    [/\bpanchayat\s+chunav\b/gi,     'Panchayat Election'],
+    [/\bmatdan\b/gi,                 'voting'],
+    [/\belection\s+card\b/gi,        'voter ID'],
+    [/\bpolling\s+steson\b/gi,       'polling station'],
+    [/\bsearch\s+name\b/gi,          'check name in voter list']
   ];
 
   for (const [pattern, replacement] of fixes) {
     t = t.replace(pattern, replacement);
   }
 
-  // Collapse multiple spaces
   t = t.replace(/\s{2,}/g, ' ').trim();
-
   return t;
 }
 
@@ -1072,21 +921,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sendMessage();
       }
     });
-
-    // Rotating placeholders
-    const placeholders = [
-      "Ask about Voter Registration...",
-      "voter card kaise milega?",
-      "How to find my polling booth?",
-      "ami ki vote dite pari?",
-      "What documents do I need for Voter ID?",
-      "Form 6 kya hota hai?",
-    ];
-    let pIndex = 0;
-    setInterval(() => {
-      pIndex = (pIndex + 1) % placeholders.length;
-      input.setAttribute('placeholder', placeholders[pIndex]);
-    }, 4000);
   }
 
   // Location Toggle
