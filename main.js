@@ -11,7 +11,13 @@ const MULTILINGUAL_PLACEHOLDERS = [
   { lang: 'ml', text: 'വോട്ട് ചെയ്യുന്നത് എങ്ങനെ? (Vote cheyyunnath engane?)' },
   { lang: 'pa', text: 'ਮੇਰੀ ਵੋਟ ਕਿੱਥੇ ਹੈ? (Meri vote kithe hai?)' },
   { lang: 'ur', text: 'ووٹ کیسے ڈالیں؟ (Vote kaise dale?)' },
-  { lang: 'sa', text: 'मतदानं कथं करणीयम्? (Matdan katham karaniyam?)' }
+  { lang: 'as', text: 'মোৰ পোলিং বুথ ক’ত? (Mor polling booth kot?)' },
+  { lang: 'or', text: 'ମୋର ଭୋଟ କେଉଁଠାରେ ଅଛି? (Mora vote keunthare achi?)' },
+  { lang: 'pa', text: 'ਚੋਣਾਂ ਬਾਰੇ ਪੁੱਛੋ (Chonam bare puchho)' },
+  { lang: 'sa', text: 'किमहं मतदानं कर्तुं शक्नोमि? (Kimaham matdan karthum shaknomi?)' },
+  { lang: 'mai', text: 'हमर वोट कतय अछि? (Hammar vote katay achi?)' },
+  { lang: 'ks', text: 'میٛون پولیٛنگ بوتھ کتہِ چُھ؟ (Myon polling booth kati chhu?)' },
+  { lang: 'ne', text: 'म कसरी भोट दिन सक्छु? (Ma kasari vote dina sakchu?)' }
 ];
 let placeholderInterval = null;
 let currentPlaceholderIndex = 0;
@@ -547,8 +553,15 @@ async function sendMessage(manualText = null) {
     chatContainer.classList.add('has-messages');
     const homeEl = document.getElementById('home');
     if (homeEl) homeEl.classList.add('has-messages');
+    
+    // Enable app-level scrolling for long conversations
+    document.getElementById('app').classList.add('has-messages-active');
+    
     const suggestionsContainer = document.getElementById('dynamic-suggestions-container');
-    if (suggestionsContainer) suggestionsContainer.style.display = 'none';
+    if (suggestionsContainer) {
+      // Don't hide, just keep it visible
+      suggestionsContainer.style.display = 'flex';
+    }
   }
 
   if (!manualText) {
@@ -680,6 +693,9 @@ async function sendMessage(manualText = null) {
     isRequestInFlight = false;
 
     if (sendBtn) sendBtn.disabled = false;
+    
+    // Refresh suggestions based on the last query
+    setDynamicSuggestions(text);
   } catch (error) {
     removeSkeletonLoader();
     console.error('Chat Error:', error);
@@ -942,15 +958,16 @@ function getDynamicGreeting() {
   ]);
 }
 
-function setDynamicSuggestions() {
+function setDynamicSuggestions(query = null) {
   const container = document.getElementById('dynamic-suggestions-container');
   if (!container) return;
 
-  const shuffled = [...INITIAL_SUGGESTIONS].sort(() => 0.5 - Math.random());
+  const chips = query ? (getFollowUpChips(query) || INITIAL_SUGGESTIONS) : INITIAL_SUGGESTIONS;
+  const shuffled = [...chips].sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 2);
 
   container.innerHTML = selected.map(s => `
-    <button class="suggestion-card" onclick="askChip('${s.q.replace(/'/g, "\\'")}')">
+    <button class="suggestion-card fade-in" onclick="askChip('${s.q.replace(/'/g, "\\'")}')">
       <span class="card-icon">${s.icon}</span>
       <div class="card-text">
         <strong>${s.label}</strong>
@@ -1091,12 +1108,25 @@ document.addEventListener('DOMContentLoaded', () => {
 function startPlaceholderRotation() {
   const input = document.getElementById('user-input');
   if (!input || placeholderInterval) return;
+
+  // Creative shuffle: Start with English, then shuffle the rest
+  const others = MULTILINGUAL_PLACEHOLDERS.slice(1).sort(() => Math.random() - 0.5);
+  const shuffledPlaceholders = [MULTILINGUAL_PLACEHOLDERS[0], ...others];
+
   placeholderInterval = setInterval(() => {
     if (input.value === '' && document.activeElement !== input) {
-      currentPlaceholderIndex = (currentPlaceholderIndex + 1) % MULTILINGUAL_PLACEHOLDERS.length;
-      input.placeholder = MULTILINGUAL_PLACEHOLDERS[currentPlaceholderIndex].text;
+      // Trigger buttery transition
+      input.classList.remove('placeholder-transition');
+      void input.offsetWidth; // Force reflow
+      input.classList.add('placeholder-transition');
+
+      // Change text mid-fade
+      setTimeout(() => {
+        currentPlaceholderIndex = (currentPlaceholderIndex + 1) % shuffledPlaceholders.length;
+        input.placeholder = shuffledPlaceholders[currentPlaceholderIndex].text;
+      }, 400); // Sync with CSS timing
     }
-  }, 3500);
+  }, 6000); // 6s interval for natural reading
 }
 
 function updateUILanguage(lang) {
