@@ -44,6 +44,16 @@
   overflow-x: hidden !important;
 }
 
+/* Mobile: tighter padding */
+@media (max-width: 480px) {
+  #home .chat-container-main {
+    padding: 0 1rem !important;
+  }
+  #home .ai-input-wrapper {
+    padding: 0 !important;
+  }
+}
+
 /* 4. AUTO-MARGIN CENTERING — the reliable way
    Top spacer pushes greeting down, bottom spacer pushes input up.
    No clipping. No pseudo-element tricks. */
@@ -304,8 +314,57 @@
 
 @media (max-width: 600px) {
   .welcome-suggestions-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
     gap: 8px;
+  }
+  .suggestion-card {
+    width: 100%;
+    justify-content: flex-start;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Language selector full-width pill on mobile */
+  .language-selector select {
+    width: 100%;
+    min-width: 140px;
+  }
+
+  /* Tighter welcome title */
+  .welcome-title {
+    font-size: clamp(1.1rem, 5vw, 1.5rem) !important;
+  }
+
+  /* Slightly smaller input textarea */
+  .input-container-floating textarea {
+    font-size: 0.9rem !important;
+    padding: 8px 4px 8px 10px !important;
+  }
+
+  /* Compact input pill */
+  .input-container-floating {
+    padding: 4px 6px 4px 4px !important;
+  }
+
+  /* Make send button slightly smaller */
+  .send-btn-round,
+  .send-btn-minimal {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Compact the bottom hint text */
+  .input-footer-minimal {
+    font-size: 0.6rem !important;
+    margin-top: 4px !important;
+  }
+
+  /* Remove extra bottom gap so footer sits flush */
+  #home .chat-container-main:not(.has-messages) .ai-input-wrapper {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 }
 

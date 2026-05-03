@@ -14,6 +14,70 @@ app.use(express.json({ limit: '1mb' }));
 const port = process.env.PORT || 8080;
 
 // ─────────────────────────────────────────────
+// SECURITY HEADERS
+// ─────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Allow CORS for development and Cloud Run deployments
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:8080',
+    process.env.ALLOWED_ORIGIN,
+  ].filter(Boolean);
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Session-Id');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
+// ─────────────────────────────────────────────
+// RATE LIMITER (in-memory, no extra dependencies)
+// 30 requests per 15 minutes per IP — generous for civic use
+// ─────────────────────────────────────────────
+const rateLimitStore = new Map(); // IP → { count, resetAt }
+const RATE_LIMIT = parseInt(process.env.RATE_LIMIT || '30', 10);
+const RATE_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function rateLimiter(req, res, next) {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+             req.socket?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const record = rateLimitStore.get(ip);
+
+  if (!record || now > record.resetAt) {
+    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return next();
+  }
+
+  if (record.count >= RATE_LIMIT) {
+    const retryAfter = Math.ceil((record.resetAt - now) / 1000);
+    res.setHeader('Retry-After', retryAfter);
+    return res.status(429).json({
+      error: `Too many requests. Please wait ${Math.ceil(retryAfter / 60)} minute(s) and try again.`,
+    });
+  }
+
+  record.count++;
+  next();
+}
+
+// Clean up old entries every 30 minutes to prevent memory leaks
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of rateLimitStore.entries()) {
+    if (now > record.resetAt) rateLimitStore.delete(ip);
+  }
+}, 30 * 60 * 1000);
+
+
+// ─────────────────────────────────────────────
 // SYSTEM INSTRUCTION
 // ─────────────────────────────────────────────
 const SYSTEM_INSTRUCTION = `##RULE #1 — LANGUAGE (NON-NEGOTIABLE)##
@@ -440,9 +504,9 @@ app.get('/api/health', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// AI CHAT ENDPOINT
+// AI CHAT ENDPOINT (rate-limited)
 // ─────────────────────────────────────────────
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', rateLimiter, async (req, res) => {
   let slotAcquired = false;
   try {
     const { prompt } = req.body;
