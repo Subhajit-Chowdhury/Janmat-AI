@@ -297,40 +297,90 @@ window.retryLastMessage = async function() {
 let recognition = null;
 let isListening = false;
 
+/**
+ * Normalize voice-to-text output before sending to AI.
+ * Fixes common STT artifacts and phonetic misrecognitions.
+ */
+function normalizeVoiceInput(text) {
+  if (!text) return text;
+  let t = text.trim();
+
+  // Fix common STT phonetic errors for Indian election terms
+  const fixes = [
+    [/\bvoter\s+eye\s+dee\b/gi,      'voter ID'],
+    [/\bvooter\b/gi,                 'voter'],
+    [/\bvoteer\b/gi,                 'voter'],
+    [/\bform\s+(?:six|6|chhe)\b/gi,  'Form 6'],
+    [/\bform\s+(?:seven|7|saat)\b/gi,'Form 7'],
+    [/\bform\s+(?:eight|8|aath)\b/gi,'Form 8'],
+    [/\bepick\b/gi,                  'EPIC'],
+    [/\be\s+pick\b/gi,               'e-EPIC'],
+    [/\baadhar\b/gi,                 'Aadhaar'],
+    [/\badhar\b/gi,                  'Aadhaar'],
+    [/\bregistartion\b/gi,           'registration'],
+    [/\bregisteration\b/gi,          'registration'],
+    [/\bregitration\b/gi,            'registration'],
+    [/\bpoling\s+booth\b/gi,         'polling booth'],
+    [/\belecton\b/gi,                'election'],
+    [/\belection\s+commision\b/gi,   'Election Commission'],
+    [/\block\s+sabha\b/gi,           'Lok Sabha'],
+    [/\bvidhan\s+sabha\b/gi,         'Vidhan Sabha'],
+    [/\brajya\s+sabha\b/gi,          'Rajya Sabha'],
+  ];
+
+  for (const [pattern, replacement] of fixes) {
+    t = t.replace(pattern, replacement);
+  }
+
+  // Collapse multiple spaces
+  t = t.replace(/\s{2,}/g, ' ').trim();
+
+  return t;
+}
+
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = true;
-  recognition.maxAlternatives = 1;
+  recognition.maxAlternatives = 3; // Pick highest-confidence alternative
 
   recognition.onresult = (event) => {
     let interim = '';
     let final = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) final += t;
-      else interim += t;
+      if (event.results[i].isFinal) {
+        // Pick the highest-confidence alternative
+        let best = event.results[i][0];
+        for (let j = 1; j < event.results[i].length; j++) {
+          if (event.results[i][j].confidence > best.confidence) best = event.results[i][j];
+        }
+        final += best.transcript;
+      } else {
+        interim += event.results[i][0].transcript;
+      }
     }
     const input = document.getElementById('user-input');
     if (input) {
-      input.value = final || interim;
+      input.value = final ? normalizeVoiceInput(final) : interim;
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 200) + 'px';
     }
-    showVoiceToast(final ? `✅ "${final.trim()}"` : `🎙️ ${interim}...`, final ? 'processing' : 'listening');
+    showVoiceToast(final ? `✅ "${normalizeVoiceInput(final).trim()}"` : `🎙️ ${interim}...`, final ? 'processing' : 'listening');
   };
 
   recognition.onerror = (event) => {
     isListening = false;
     setMicActive(false);
     const msgs = {
-      'no-speech': 'No speech detected. Try again.',
-      'audio-capture': 'No microphone found.',
-      'not-allowed': 'Microphone access denied — please allow mic in browser settings.',
-      'network': 'Network error. Check your connection.',
+      'no-speech':      'No speech detected. Tap 🎙️ and try again.',
+      'audio-capture':  'No microphone found. Please connect a mic.',
+      'not-allowed':    'Mic access denied — allow microphone in browser settings.',
+      'network':        'Network error during voice capture. Check connection.',
+      'aborted':        'Voice input cancelled.',
+      'language-not-supported': 'Language not supported. Switching to English.',
     };
-    showVoiceToast(`❌ ${msgs[event.error] || 'Error: ' + event.error}`, 'error');
+    showVoiceToast(`❌ ${msgs[event.error] || 'Voice error: ' + event.error}`, 'error');
     setTimeout(hideVoiceToast, 3500);
   };
 
@@ -340,7 +390,9 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const input = document.getElementById('user-input');
     const val = input ? input.value.trim() : '';
     if (val) {
-      showVoiceToast(`✅ Sending: "${val}"`, 'processing');
+      const normalized = normalizeVoiceInput(val);
+      if (input) input.value = normalized;
+      showVoiceToast(`✅ Sending: "${normalized}"`, 'processing');
       setTimeout(() => { hideVoiceToast(); sendMessage(); }, 600);
     } else {
       hideVoiceToast();
@@ -396,20 +448,32 @@ function setMicActive(active) {
 function startRecording() {
   if (isListening) { stopRecording(); return; }
   if (!recognition) {
-    showVoiceToast('Voice not supported. Try Chrome or Edge.', 'error');
-    setTimeout(hideVoiceToast, 3000);
+    showVoiceToast('Voice input not supported. Please use Chrome or Edge.', 'error');
+    setTimeout(hideVoiceToast, 3500);
     return;
   }
-  recognition.lang = navigator.language || 'en-IN';
+
+  // Multi-language: prefer browser language, fall back to Hindi-IN then English-IN
+  // This ensures Hindi/Hinglish voice input works correctly
+  const browserLang = navigator.language || 'hi-IN';
+  recognition.lang = browserLang.startsWith('hi') ? 'hi-IN' :
+                     browserLang.startsWith('bn') ? 'bn-IN' :
+                     browserLang.startsWith('ta') ? 'ta-IN' :
+                     browserLang.startsWith('te') ? 'te-IN' :
+                     browserLang.startsWith('mr') ? 'mr-IN' : 'hi-IN';
+
   isListening = true;
   setMicActive(true);
-  showVoiceToast('🎙️ Listening… Speak now', 'listening');
+  showVoiceToast('🎙️ Listening… Speak your question', 'listening');
   try {
     recognition.start();
   } catch (e) {
-    isListening = false;
-    setMicActive(false);
-    hideVoiceToast();
+    // Already started — ignore
+    if (e.name !== 'InvalidStateError') {
+      isListening = false;
+      setMicActive(false);
+      hideVoiceToast();
+    }
   }
 }
 
