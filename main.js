@@ -1,4 +1,20 @@
 import './style.css';
+const MULTILINGUAL_PLACEHOLDERS = [
+  { lang: 'en', text: 'Ask about elections, voting, timelines...' },
+  { lang: 'hi', text: 'वोटर आईडी कैसे बनाएं? (Voter ID kaise banaye?)' },
+  { lang: 'bn', text: 'আমার পোলিং বুথ কোথায়? (Amar polling booth kothay?)' },
+  { lang: 'ta', text: 'வாக்களிப்பது எப்படி? (Vote pannuvathu eppadi?)' },
+  { lang: 'te', text: 'ఓటు వేయడం ఎలా? (Vote veyadam ela?)' },
+  { lang: 'mr', text: 'मतदानाची तारीख काय आहे? (Voting date kay ahe?)' },
+  { lang: 'gu', text: 'ચૂંટણી પંચ શું છે? (Election Commission shu che?)' },
+  { lang: 'kn', text: 'ನನ್ನ ವಾರ್ಡ್ ಯಾವುದು? (Nanna ward yavudu?)' },
+  { lang: 'ml', text: 'വോട്ട് ചെയ്യുന്നത് എങ്ങനെ? (Vote cheyyunnath engane?)' },
+  { lang: 'pa', text: 'ਮੇਰੀ ਵੋਟ ਕਿੱਥੇ ਹੈ? (Meri vote kithe hai?)' },
+  { lang: 'ur', text: 'ووٹ کیسے ڈالیں؟ (Vote kaise dale?)' },
+  { lang: 'sa', text: 'मतदानं कथं करणीयम्? (Matdan katham karaniyam?)' }
+];
+let placeholderInterval = null;
+let currentPlaceholderIndex = 0;
 import { askElectAI } from './src/api/gemini.js';
 import { logChatSession } from './src/api/firebase.js';
 
@@ -464,22 +480,24 @@ function startRecording() {
     return;
   }
 
-  // Multi-language: prefer browser language, fall back to Hindi-IN then English-IN
-  // This ensures Hindi/Hinglish voice input works correctly
-  const browserLang = navigator.language || 'hi-IN';
-  recognition.lang = browserLang.startsWith('hi') ? 'hi-IN' :
-                     browserLang.startsWith('bn') ? 'bn-IN' :
-                     browserLang.startsWith('ta') ? 'ta-IN' :
-                     browserLang.startsWith('te') ? 'te-IN' :
-                     browserLang.startsWith('mr') ? 'mr-IN' : 'hi-IN';
+  // 22 Official Languages Mapping
+  const LANG_MAP = {
+    'en': 'en-IN', 'hi': 'hi-IN', 'bn': 'bn-IN', 'ta': 'ta-IN', 'te': 'te-IN',
+    'mr': 'mr-IN', 'gu': 'gu-IN', 'kn': 'kn-IN', 'ml': 'ml-IN', 'pa': 'pa-IN',
+    'ur': 'ur-IN', 'as': 'as-IN', 'brx': 'brx-IN', 'doi': 'doi-IN', 'ks': 'ks-IN',
+    'kok': 'kok-IN', 'mai': 'mai-IN', 'mni': 'mni-IN', 'ne': 'ne-NP', 'or': 'or-IN',
+    'sa': 'sa-IN', 'sat': 'sat-IN', 'sd': 'sd-IN'
+  };
+
+  const selectedLang = localStorage.getItem('elect_ai_lang') || 'en';
+  recognition.lang = LANG_MAP[selectedLang] || 'en-IN';
 
   isListening = true;
   setMicActive(true);
-  showVoiceToast('🎙️ Listening… Speak your question', 'listening');
+  showVoiceToast(`🎙️ Listening (${selectedLang.toUpperCase()})...`, 'listening');
   try {
     recognition.start();
   } catch (e) {
-    // Already started — ignore
     if (e.name !== 'InvalidStateError') {
       isListening = false;
       setMicActive(false);
@@ -709,7 +727,11 @@ const LANG_VOICE_MAP = {
   'or': ['or-IN', 'Google ଓଡ଼ିଆ'],
   'as': ['as-IN', 'Google অসমীয়া'],
   'ur': ['ur-PK', 'Google اردو'],
-  'en': ['en-IN', 'Google US English']
+  'en': ['en-IN', 'Google US English'],
+  'sa': ['hi-IN', 'Sanskrit'], // Fallback to Hindi engine
+  'ne': ['ne-NP', 'Nepali'],
+  'kok': ['hi-IN', 'Konkani'],
+  'sd': ['hi-IN', 'Sindhi']
 };
 
 function getBestVoice(langCode) {
@@ -717,10 +739,12 @@ function getBestVoice(langCode) {
   const target = LANG_VOICE_MAP[langCode] || ['en-IN', 'Google US English'];
   
   // Try to find exact match or "Google" natural voice
-  return voices.find(v => v.lang === target[0] && (v.name.includes('Google') || v.name.includes('Natural'))) 
+  const voice = voices.find(v => v.lang === target[0] && (v.name.includes('Google') || v.name.includes('Natural'))) 
          || voices.find(v => v.lang.startsWith(langCode)) 
          || voices.find(v => v.lang.includes('IN'))
+         || voices.find(v => v.name.includes('Indian'))
          || voices[0];
+  return voice;
 }
 
 window.speakMessage = function(msgId) {
@@ -1045,7 +1069,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Expose hideScrollToBottom globally for inline onclick in HTML
   window.hideScrollToBottom = hideScrollToBottom;
+
+  // Language switcher logic
+  const langSwitcher = document.getElementById('lang-switcher');
+  if (langSwitcher) {
+    const savedLang = localStorage.getItem('elect_ai_lang');
+    if (savedLang) langSwitcher.value = savedLang;
+    
+    langSwitcher.addEventListener('change', (e) => {
+      const lang = e.target.value;
+      localStorage.setItem('elect_ai_lang', lang);
+      updateUILanguage(lang);
+    });
+    
+    // Set initial UI language
+    updateUILanguage(localStorage.getItem('elect_ai_lang') || 'en');
+    startPlaceholderRotation();
+  }
 });
+
+function startPlaceholderRotation() {
+  const input = document.getElementById('user-input');
+  if (!input || placeholderInterval) return;
+  placeholderInterval = setInterval(() => {
+    if (input.value === '' && document.activeElement !== input) {
+      currentPlaceholderIndex = (currentPlaceholderIndex + 1) % MULTILINGUAL_PLACEHOLDERS.length;
+      input.placeholder = MULTILINGUAL_PLACEHOLDERS[currentPlaceholderIndex].text;
+    }
+  }, 3500);
+}
+
+function updateUILanguage(lang) {
+  if (placeholderInterval) {
+    clearInterval(placeholderInterval);
+    placeholderInterval = null;
+  }
+  const placeholders = {
+    'en': 'Ask about elections, voting, timelines...',
+    'hi': 'चुनाव, मतदान और समयसीमा के बारे में पूछें...',
+    'bn': 'নির্বাচন, ভোটদান এবং সময়সীমা সম্পর্কে জিজ্ঞাসা করুন...',
+    'ta': 'தேர்தல்கள், வாக்களிப்பு மற்றும் காலக்கெடு பற்றி கேளுங்கள்...',
+    'te': 'ఎన్నికలు, ఓటింగ్ మరియు టైమ్‌లైన్ల గురించి అడగండి...',
+    'mr': 'निवडणुका, मतदान आणि वेळापत्रकाबद्दल विचारा...',
+    'gu': 'ચૂંટણી, મતદાન અને સમયરેખા વિશે પૂછો...',
+    'kn': 'ಚುನಾವಣೆಗಳು, ಮತದಾನ ಮತ್ತು ಟೈಮ್‌ಲೈನ್‌ಗಳ ಬಗ್ಗೆ ಕೇಳಿ...',
+    'ml': 'തിരഞ്ഞെടുപ്പ്, വോട്ടിംഗ്, ടൈംലൈനുകൾ എന്നിവയെക്കുറിച്ച് ചോദിക്കുക...',
+    'pa': 'ਚੋਣਾਂ, ਵੋਟਿੰਗ ਅਤੇ ਸਮਾਂ ਸੀਮਾ ਬਾਰੇ ਪੁੱਛੋ...',
+    'ur': 'انتخابات، ووٹنگ اور ٹائم لائنز کے بارے में پوچھیں...'
+  };
+  
+  const input = document.getElementById('user-input');
+  if (input) input.placeholder = placeholders[lang] || placeholders['en'];
+  
+  const subtitle = document.getElementById('dynamic-subtitle');
+  if (subtitle && lang !== 'en') {
+    subtitle.innerText = 'Ask in your native language — we understand all 22 official languages of India 🇮🇳';
+  }
+}
 
 
 function updateLocationContext(type) {
