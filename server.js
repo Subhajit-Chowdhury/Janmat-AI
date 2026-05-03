@@ -24,39 +24,69 @@ const CONFIG = {
   NODE_ENV: process.env.NODE_ENV || 'production'
 };
 
-app.use(express.json({ limit: '1mb' }));
+/**
+ * System Instruction Grounding
+ * Ensures AI stays strictly within the election commission guidelines and Indian civic context.
+ */
+const SYSTEM_INSTRUCTION = `
+You are ElectAI, a premium civic assistant for Indian Elections.
+Rules:
+1. Grounding: Only provide information based on ECI (Election Commission of India) procedures.
+2. Neutrality: Maintain absolute political neutrality. Do not favor any party or candidate.
+3. Language: Support all 22 official languages of India. Detect and mirror the user's dialect.
+4. Specificity: Help with Form 6 (New Voter), Form 7 (Deletion), Form 8 (Correction).
+5. Safety: If asked for illegal advice or unofficial data, politely redirect to ECI sources.
+`;
+
+// In-memory state (For production, use Redis/Firestore)
+const sessions = new Map();
+const rateLimits = new Map();
+
+app.use(express.json());
 
 /**
- * SECURITY MIDDLEWARE
- * Implements strict headers, CSP, and CORS for 100% Security Score.
+ * Security Middleware Layer
+ * Implements CSP, HSTS, and XSS protection.
  */
 app.use((req, res, next) => {
+  // Prevent MIME type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  // Clickjacking protection
   res.setHeader('X-Frame-Options', 'DENY');
+  // XSS protection for older browsers
   res.setHeader('X-XSS-Protection', '1; mode=block');
+  // Referrer privacy
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Enforce HTTPS
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   
-  // Content Security Policy (CSP) — allows Web Speech API + Google Fonts + marked.js CDN
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.google.com wss://*.google.com; media-src 'self';");
+  /**
+   * Content Security Policy (CSP)
+   * Restricts script execution and connections to trusted sources only.
+   */
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com; " +
+    "img-src 'self' data:; " +
+    "connect-src 'self' https://*.googleapis.com https://*.google.com wss://*.google.com; " +
+    "media-src 'self';"
+  );
 
+  // CORS - Restricted to trusted local and production origins
   const allowedOrigins = ['http://localhost:5173', 'http://localhost:8080', process.env.ALLOWED_ORIGIN].filter(Boolean);
   const origin = req.headers.origin;
-  if (!origin || allowedOrigins.includes(origin) || CONFIG.NODE_ENV !== 'production') {
+  if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Session-Id');
+  
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
 
-const rateLimitStore = new Map();
-function rateLimiter(req, res, next) {
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
-  const now = Date.now();
-  const record = rateLimitStore.get(ip);
-  if (!record || now > record.resetAt) {
     rateLimitStore.set(ip, { count: 1, resetAt: now + CONFIG.RATE_WINDOW_MS });
     return next();
   }
