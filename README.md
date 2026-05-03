@@ -1,4 +1,4 @@
-# Elect AI 🇮🇳
+# Elect AI
 ### Your AI-Powered Guide to Indian Elections | H2S PromptWars Challenge 2
 
 **Elect AI** is a production-grade, multilingual AI civic assistant that democratizes election literacy across India. Built entirely on Google's AI ecosystem, it simplifies the complex landscape of Indian voter registration, electoral processes, and polling procedures into a conversational, culturally intelligent experience — in any of the 22 official Indian languages.
@@ -9,15 +9,15 @@
 
 > _Smart time-aware greetings, multilingual input, and ECI-verified answers — all in a single premium window._
 
-![ElectAI Preview](./docs/screenshot.png)
+![ElectAI Preview](./preview.jpg)
 
 | Feature | Detail |
 |---|---|
-| 🎨 **Tricolor Gradient UI** | Saffron → White → Green — India's national colors |
-| 💬 **22-Language Support** | Responds in the exact language/dialect the user writes in |
-| ⚡ **Context-Aware Chips** | Suggestion cards update based on conversation context |
-| 🏛️ **ECI-Grounded Answers** | Knowledge base drawn from voters.eci.gov.in and eci.gov.in |
-| 🔒 **Secure Proxy** | API keys never exposed to client; rate-limited server proxy |
+| **Tricolor Gradient UI** | Saffron → White → Green — India's national colors |
+| **22-Language Support** | Responds in the exact language/dialect the user writes in |
+| **Context-Aware Chips** | Suggestion cards update based on conversation context |
+| **ECI-Grounded Answers** | Knowledge base drawn from voters.eci.gov.in and eci.gov.in |
+| **Secure Proxy** | API keys never exposed to client; rate-limited server proxy |
 
 ---
 
@@ -234,5 +234,3 @@ gcloud run deploy elect-ai \
 ---
 
 *Developed for H2S PromptWars Challenge 2026 — Empowering every Indian vote through AI.*
-
-> *"Democracy is not a spectator sport. Every informed question is a vote for a stronger India."*
